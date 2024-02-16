@@ -18,6 +18,17 @@ import javax.sound.sampled.Port;
  *
  */
 public class LightDB {
+	public static Properties properties;
+
+	static {
+		InputStream inputStream = LightDB.class.getClassLoader().getResourceAsStream("properties.properties");
+		Properties properties = new Properties();
+		try {
+			properties.load(inputStream);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	public static void main(String[] args) throws IOException {
 
@@ -63,6 +74,8 @@ public class LightDB {
 
 		return properties;
 	}
+
+
 
 
 }
