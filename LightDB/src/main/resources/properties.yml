@@ -1,0 +1,7 @@
+db:
+  data:
+    relative-path: samples/db/data
+  schema: samples/db/schema.txt
+
+output-path: samples/output/
+input-path: samples/input/
