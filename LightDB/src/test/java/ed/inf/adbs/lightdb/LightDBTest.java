@@ -1,7 +1,7 @@
 package ed.inf.adbs.lightdb;
 
-import static org.junit.Assert.assertTrue;
-
+import Operator.Operator;
+import Operator.ScanOperator;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -12,13 +12,15 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import org.junit.Test;
+import pojo.Catalog;
+import pojo.PropertyInTest;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for LightDB.
@@ -85,6 +87,13 @@ public class LightDBTest {
 			List<OrderByElement> orderByElements = plainSelect.getOrderByElements();
 			System.out.println(orderByElements);
 		}
+	}
+
+	@Test
+	public void ScanOperatorSimpleTest(){
+		Catalog catalog = Catalog.getInstance();
+		Operator operator = new ScanOperator(PropertyInTest.sqlPath, catalog.getDbPath(), catalog.getOutputPath(), "query1.sql", catalog.getSchemaPath());
+		operator.dump();
 	}
 
 

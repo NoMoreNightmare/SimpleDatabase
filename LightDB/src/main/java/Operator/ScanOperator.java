@@ -1,13 +1,23 @@
 package Operator;
 
-import Tuple.Tuple;
-import ed.inf.adbs.lightdb.LightDB;
+import pojo.Tuple;
 
-public class ScanOperator implements Operator{
+public class ScanOperator extends Operator{
+
+    //TODO 创建一个能够读取csv文件的对象引用
+
+
+
+
 
     //TODO 应该在构造的时候知道要解析的sql文件路径，数据文件的路径和最终输出的路径
-    public ScanOperator(String filename){
+    public ScanOperator(String tableName){
+        //TODO 得到表名
 
+        //TODO 将dbPath和表名拼接，获取数据文件的路径
+            //TODO 读取数据文件，创建读取文件的对象
+
+        //TODO 存储outputPath
     }
 
     //TODO 获取这个operator会输出的下一个tuple
@@ -22,16 +32,5 @@ public class ScanOperator implements Operator{
 
     }
 
-    //TODO 把tuple写到适合的printStream，比如文件或者输出控制台
-    @Override
-    public void dump() {
-        String printChoice = LightDB.properties.getProperty("printStream");
-        if ("file".equals(printChoice)){
 
-        }else if("console".equals(printChoice)){
-
-        }else{
-            //TODO 默认输出到控制台
-        }
-    }
 }

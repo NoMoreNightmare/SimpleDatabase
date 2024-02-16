@@ -10,6 +10,7 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
+import pojo.Catalog;
 
 import javax.sound.sampled.Port;
 
@@ -18,17 +19,6 @@ import javax.sound.sampled.Port;
  *
  */
 public class LightDB {
-	public static Properties properties;
-
-	static {
-		InputStream inputStream = LightDB.class.getClassLoader().getResourceAsStream("properties.properties");
-		Properties properties = new Properties();
-		try {
-			properties.load(inputStream);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	public static void main(String[] args) throws IOException {
 
@@ -40,6 +30,10 @@ public class LightDB {
 		String databaseDir = args[0];
 		String inputFile = args[1];
 		String outputFile = args[2];
+
+		Catalog catalog = Catalog.getInstance();
+		catalog.setDbPath(databaseDir);
+		catalog.setOutputPath(outputFile);
 
 		// Just for demonstration, replace this function call with your logic
 		parsingExample(inputFile);
