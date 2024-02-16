@@ -50,9 +50,9 @@ public class LightDB {
 			Statement statement = CCJSqlParserUtil.parse(new FileReader(filename));
 //            Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Boats");
 			if (statement != null) {
-				System.out.println("Read statement: " + statement);
 				Select select = (Select) statement;
-				System.out.println("Select body is " + select.getSelectBody());
+				PlainSelect plainSelect = select.getPlainSelect();
+
 			}
 
 		} catch (Exception e) {

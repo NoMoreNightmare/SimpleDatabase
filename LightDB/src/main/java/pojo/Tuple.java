@@ -6,14 +6,31 @@ import java.util.List;
 import java.util.Map;
 
 public class Tuple {
+    public static List<String> columns;
+
     static{
         columns = new ArrayList<>();
     }
-    static List<String> columns;
     List<Integer> values = new ArrayList<>();
 
-    public void addField(int value){
-        values.add(value);
+    public void setValues(List<Integer> values){
+        this.values = values;
     }
+
+    public List<Integer> getValues(){
+        return values;
+    }
+
+    /**
+     * 用来打印tuple的东西，上传时删除
+     */
+    public void printTuple(){
+        for(Integer i : values){
+            System.out.print(i + " ");
+        }
+        System.out.println();
+    }
+
+
 
 }

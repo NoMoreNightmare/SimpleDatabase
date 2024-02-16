@@ -1,4 +1,5 @@
 package Operator;
+import pojo.Catalog;
 import pojo.PropertyInTest;
 import pojo.Tuple;
 import ed.inf.adbs.lightdb.LightDB;
@@ -6,11 +7,6 @@ import ed.inf.adbs.lightdb.LightDB;
 import java.io.*;
 
 public abstract class Operator {
-    String sqlPath;
-    String dbPath;
-    String outputPath;
-    String sqlFilename;
-    String schemaPath;
     public abstract Tuple getNextTuple();
 
     public abstract void reset();
@@ -20,13 +16,12 @@ public abstract class Operator {
     public void dump() {
         String printChoice = PropertyInTest.properties.getProperty("printStream");
         if ("file".equals(printChoice)){
-            PrintStream printStream = new PrintStream(System.out);
-
-            printStream.close();
-        }else if("console".equals(printChoice)){
+            String outputPath = Catalog.getInstance().getOutputPath() + "test.csv";
             File file = new File(outputPath);
             if(!file.exists()){
                 try {
+//                    file.mkdirs();
+
                     boolean success = file.createNewFile();
                     if(!success){
                         throw new IOException("create file failed");
@@ -38,6 +33,21 @@ public abstract class Operator {
             PrintStream printStream = null;
             try {
                 printStream = new PrintStream(new FileOutputStream(file, false));
+                while(true){
+                    Tuple tuple = this.getNextTuple();
+                    if(tuple == null){
+                        break;
+                    }
+                    StringBuffer stringBuffer = new StringBuffer();
+                    for(Integer value : tuple.getValues()) {
+                        stringBuffer.append(value);
+                        stringBuffer.append(",");
+                    }
+                    int index = stringBuffer.lastIndexOf(",");
+                    stringBuffer.delete(index, index + 1);
+                    printStream.print(stringBuffer);
+                    printStream.print("\n");
+                }
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }finally {
@@ -45,7 +55,30 @@ public abstract class Operator {
                     printStream.close();
                 }
             }
+        }else if("console".equals(printChoice)){
+            PrintStream printStream = null;
 
+            try {
+                printStream = new PrintStream(System.out);
+                while(true){
+                    Tuple tuple = this.getNextTuple();
+                    if(tuple == null){
+                        break;
+                    }
+                    for(Integer value : tuple.getValues()) {
+                        printStream.print(value);
+                        printStream.print(" ");
+                    }
+                    printStream.print("\n");
+                }
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+//            finally {     //printStream一旦关闭就在这个程序中再也无法启用，因此不关闭
+//                if(printStream != null){
+//                    printStream.close();
+//                }
+//            }
 
         }else{
             //TODO 默认输出到控制台

@@ -14,7 +14,9 @@ import net.sf.jsqlparser.statement.select.*;
 import org.junit.Test;
 import pojo.Catalog;
 import pojo.PropertyInTest;
+import pojo.Tuple;
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
@@ -90,9 +92,22 @@ public class LightDBTest {
 	}
 
 	@Test
-	public void ScanOperatorSimpleTest(){
+	public void ScanOperatorSimpleTest() throws FileNotFoundException, JSQLParserException {
+		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
+//            Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Boats");
+
+		String tableName = "Boats";
+		if (statement != null) {
+			Select select = (Select) statement;
+			PlainSelect plainSelect = select.getPlainSelect();
+			tableName = plainSelect.getFromItem().toString();
+			System.out.println(tableName);
+		}
 		Catalog catalog = Catalog.getInstance();
-		Operator operator = new ScanOperator(PropertyInTest.sqlPath, catalog.getDbPath(), catalog.getOutputPath(), "query1.sql", catalog.getSchemaPath());
+
+
+
+		Operator operator = new ScanOperator(tableName);
 		operator.dump();
 	}
 
