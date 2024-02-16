@@ -6,11 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Tuple {
-    public static List<String> columns;
+    public List<String> columns = new ArrayList<>();
 
-    static{
-        columns = new ArrayList<>();
-    }
     List<Integer> values = new ArrayList<>();
 
     public void setValues(List<Integer> values){
@@ -31,6 +28,18 @@ public class Tuple {
         System.out.println();
     }
 
+    public Integer getValue(String column){
+        if(columns.contains(column)){
+            int index = columns.indexOf(column);
+            return values.get(index);
+        }else{
+            return null;
+        }
+    }
+
+    public void setColumns(List<String> columns) {
+        this.columns = columns;
+    }
 
 
 }

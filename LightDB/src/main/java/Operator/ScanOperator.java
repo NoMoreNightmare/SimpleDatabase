@@ -15,6 +15,7 @@ public class ScanOperator extends Operator{
     List<List<Integer>> data = new ArrayList<>();
     public int index = 0;
 
+    List<String> columns;
 
 
 
@@ -69,7 +70,7 @@ public class ScanOperator extends Operator{
                 List<String> tableAndColumn = new ArrayList<>(Arrays.asList(line.split(" ")));
                 if(tableName.equals(tableAndColumn.get(0))){
                     tableAndColumn.remove(0);
-                    Tuple.columns = tableAndColumn;
+                    columns = tableAndColumn;
                     break;
                 }
                 line = brSchema.readLine();
@@ -100,6 +101,7 @@ public class ScanOperator extends Operator{
         index++;
         Tuple tuple = new Tuple();
         tuple.setValues(values);
+        tuple.setColumns(columns);
         return tuple;
     }
 

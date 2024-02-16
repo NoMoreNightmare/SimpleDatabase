@@ -1,7 +1,6 @@
 package ed.inf.adbs.lightdb;
 
-import Operator.Operator;
-import Operator.ScanOperator;
+import Operator.*;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -40,7 +39,7 @@ public class LightDBTest {
 	@Test
 	public void test() throws IOException, JSQLParserException {
 		Properties properties = LightDB.loadProperties();
-		String filename = properties.getProperty("input-path") + "mytest.sql";
+		String filename = "samples/input/mytest.sql";
 		Statement statement = CCJSqlParserUtil.parse(new FileReader(filename));
 //            Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Boats");
 		if (statement != null) {
@@ -109,6 +108,33 @@ public class LightDBTest {
 
 		Operator operator = new ScanOperator(tableName);
 		operator.dump();
+	}
+
+	@Test
+	public void SelectOperatorSimpleTest() throws FileNotFoundException, JSQLParserException {
+		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
+//            Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Boats");
+
+		String tableName = "Boats";
+		Expression expression = null;
+		if (statement != null) {
+			Select select = (Select) statement;
+			PlainSelect plainSelect = select.getPlainSelect();
+			tableName = plainSelect.getFromItem().toString();
+			expression = plainSelect.getWhere();
+		}
+
+		Catalog catalog = Catalog.getInstance();
+
+
+
+		Operator operator = new SelectOperator(tableName, expression);
+		operator.dump();
+	}
+
+	@Test
+	public void idonknow(){
+		System.out.println(true & false);
 	}
 
 
