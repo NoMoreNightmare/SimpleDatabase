@@ -1,9 +1,17 @@
 package ed.inf.adbs.lightdb;
 
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Properties;
+
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.*;
+
+import javax.sound.sampled.Port;
 
 /**
  * Lightweight in-memory database system
@@ -11,7 +19,7 @@ import net.sf.jsqlparser.statement.select.Select;
  */
 public class LightDB {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		if (args.length != 3) {
 			System.err.println("Usage: LightDB database_dir input_file output_file");
@@ -40,11 +48,21 @@ public class LightDB {
 				System.out.println("Read statement: " + statement);
 				Select select = (Select) statement;
 				System.out.println("Select body is " + select.getSelectBody());
-
 			}
+
 		} catch (Exception e) {
 			System.err.println("Exception occurred during parsing");
 			e.printStackTrace();
 		}
 	}
+
+	public static Properties loadProperties() throws IOException {
+		InputStream inputStream = LightDB.class.getClassLoader().getResourceAsStream("properties.properties");
+		Properties properties = new Properties();
+		properties.load(inputStream);
+
+		return properties;
+	}
+
+
 }
