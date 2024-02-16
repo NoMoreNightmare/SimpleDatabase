@@ -1,0 +1,1 @@
+select * from table1 left join table2 on table1.id = table2.id
