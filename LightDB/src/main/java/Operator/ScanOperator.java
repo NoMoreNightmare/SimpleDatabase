@@ -67,8 +67,12 @@ public class ScanOperator extends Operator{
             brSchema = new BufferedReader(frSchema);
             String line = brSchema.readLine();
             while(line != null){
-                List<String> tableAndColumn = new ArrayList<>(Arrays.asList(line.split(" ")));
-                if(tableName.equals(tableAndColumn.get(0))){
+                String[] columnStrings = line.split(" ");
+                for(int i = 0; i < columnStrings.length; i++){
+                    columnStrings[i] = columnStrings[i].toUpperCase();
+                }
+                List<String> tableAndColumn = new ArrayList<>(Arrays.asList(columnStrings));
+                if(tableName.toUpperCase().equals(tableAndColumn.get(0))){
                     tableAndColumn.remove(0);
                     columns = tableAndColumn;
                     break;

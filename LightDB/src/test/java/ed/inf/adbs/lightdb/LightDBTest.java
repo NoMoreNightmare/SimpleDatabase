@@ -1,6 +1,7 @@
 package ed.inf.adbs.lightdb;
 
 import Operator.*;
+import Parser.TopInterpreter;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -133,8 +134,62 @@ public class LightDBTest {
 	}
 
 	@Test
-	public void idonknow(){
-		System.out.println(true & false);
+	public void ProjectOperatorSimpleTest() throws FileNotFoundException, JSQLParserException {
+//		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
+            Statement statement = CCJSqlParserUtil.parse("SELECT e,D FROM BOATS where F = 8");
+
+		String tableName = "Boats";
+		Expression expression = null;
+		List<SelectItem<?>> selectItems = null;
+		if (statement != null) {
+			Select select = (Select) statement;
+			PlainSelect plainSelect = select.getPlainSelect();
+			tableName = plainSelect.getFromItem().toString();
+			expression = plainSelect.getWhere();
+			selectItems = plainSelect.getSelectItems();
+		}
+
+		Catalog catalog = Catalog.getInstance();
+
+
+
+		Operator operator = new ProjectOperator(tableName, expression, selectItems);
+		operator.dump();
+	}
+
+	@Test
+	public void idonknow() throws FileNotFoundException, JSQLParserException {
+//		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
+            Statement statement = CCJSqlParserUtil.parse("SELECT id FROM Boats");
+
+		String tableName = "Boats";
+		Expression expression = null;
+		SelectItem selectItem = null;
+		if (statement != null) {
+			Select select = (Select) statement;
+			PlainSelect plainSelect = select.getPlainSelect();
+			tableName = plainSelect.getFromItem().toString();
+			expression = plainSelect.getWhere();
+			List<SelectItem<?>> selectItems = plainSelect.getSelectItems();
+			for(SelectItem<?> item : selectItems){
+				System.out.println(item.getExpression() instanceof Column);
+				System.out.println(item.getExpression() instanceof AllColumns);
+			}
+		}
+
+		Catalog catalog = Catalog.getInstance();
+
+
+	}
+
+
+	@Test
+	public void idonkknow2() throws FileNotFoundException, JSQLParserException {
+
+		TopInterpreter topInterpreter = new TopInterpreter();
+		topInterpreter.parseStatement(PropertyInTest.properties.getProperty("input-path"));
+
+		topInterpreter.dump();
 	}
 
 

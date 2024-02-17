@@ -29,6 +29,7 @@ public class Tuple {
     }
 
     public Integer getValue(String column){
+        column = column.toUpperCase();
         if(columns.contains(column)){
             int index = columns.indexOf(column);
             return values.get(index);

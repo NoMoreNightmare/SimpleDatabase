@@ -1,1 +1,1 @@
-select * from Boats where Boats.D >= 104 and E > 1;
+select D from Boats where Boats.D >= 104 and E > 1;
