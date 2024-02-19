@@ -2,6 +2,8 @@ package Operator;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.AllColumns;
+import net.sf.jsqlparser.statement.select.FromItem;
+import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import pojo.Tuple;
 
@@ -11,13 +13,19 @@ import java.util.List;
 public class ProjectOperator extends Operator{
     Operator operator;
     List<SelectItem<?>> selectItem;
-    public ProjectOperator(String tableName, Expression expression, List<SelectItem<?>> selectItem){
-        this.operator = new SelectOperator(tableName, expression);
+
+    public ProjectOperator(FromItem fromItem, Expression expression, List<SelectItem<?>> selectItem){
+        if(expression == null){
+            this.operator = new ScanOperator(fromItem);
+        }else{
+            this.operator = new SelectOperator(fromItem, expression);
+        }
+
         this.selectItem = selectItem;
     }
 
-    public ProjectOperator(String tableName, List<SelectItem<?>> selectItem){
-        this.operator = new ScanOperator(tableName);
+    public ProjectOperator(FromItem fromItem, Expression expression, List<SelectItem<?>> selectItem, List<Join> joins){
+        this.operator = new JoinOperator(fromItem, expression, joins);
         this.selectItem = selectItem;
     }
 

@@ -1,5 +1,6 @@
 package ed.inf.adbs.lightdb;
 
+import Interpreter.TopInterpreter;
 import Operator.*;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
@@ -19,6 +20,7 @@ import pojo.Parser.JoinExpressionDeParser;
 import pojo.PropertyInTest;
 import pojo.Tuple;
 
+import javax.security.auth.Refreshable;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -100,11 +102,11 @@ public class LightDBTest {
 		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
 //            Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Boats");
 
-		String tableName = "Boats";
+		FromItem tableName = null;
 		if (statement != null) {
 			Select select = (Select) statement;
 			PlainSelect plainSelect = select.getPlainSelect();
-			tableName = plainSelect.getFromItem().toString();
+			tableName = plainSelect.getFromItem();
 			System.out.println(tableName);
 		}
 		Catalog catalog = Catalog.getInstance();
@@ -120,12 +122,12 @@ public class LightDBTest {
 		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
 //            Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Boats");
 
-		String tableName = "Boats";
+		FromItem tableName = null;
 		Expression expression = null;
 		if (statement != null) {
 			Select select = (Select) statement;
 			PlainSelect plainSelect = select.getPlainSelect();
-			tableName = plainSelect.getFromItem().toString();
+			tableName = plainSelect.getFromItem();
 			expression = plainSelect.getWhere();
 
 		}
@@ -144,13 +146,13 @@ public class LightDBTest {
 //		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
             Statement statement = CCJSqlParserUtil.parse("SELECT Boats.e,Boats.D FROM BOATS where Boats.F = 8");
 
-		String tableName = "Boats";
+		FromItem tableName = null;
 		Expression expression = null;
 		List<SelectItem<?>> selectItems = null;
 		if (statement != null) {
 			Select select = (Select) statement;
 			PlainSelect plainSelect = select.getPlainSelect();
-			tableName = plainSelect.getFromItem().toString();
+			tableName = plainSelect.getFromItem();
 			expression = plainSelect.getWhere();
 			selectItems = plainSelect.getSelectItems();
 		}
@@ -166,47 +168,42 @@ public class LightDBTest {
 	@Test
 	public void JoinOperatorSimpleTest() throws FileNotFoundException, JSQLParserException {
 //		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
-		Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Sailors, Reserves;");
+		Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Sailors S, Reserves, Boats;");
 
-		String tableName = "Boats";
-		Expression expression = null;
-		List<SelectItem<?>> selectItems = null;
-		List<Join> joins = null;
-		if (statement != null) {
-			Select select = (Select) statement;
-			PlainSelect plainSelect = select.getPlainSelect();
-			tableName = plainSelect.getFromItem().toString();
-			expression = plainSelect.getWhere();
-			joins = plainSelect.getJoins();
-		}
+		TopInterpreter topInterpreter = new TopInterpreter();
+		topInterpreter.setStatement(statement);
 
-		Catalog catalog = Catalog.getInstance();
+		System.out.println(((Select) statement).getPlainSelect().getFromItem().getAlias());
 
-		Operator operator = new JoinOperator(tableName, expression, joins);
-		operator.dump();
+
 	}
 
 	@Test
 	public void idonknow() throws FileNotFoundException, JSQLParserException {
 //		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
-            Statement statement = CCJSqlParserUtil.parse("SELECT Boats.id FROM Boats");
+            Statement statement = CCJSqlParserUtil.parse("SELECT Boats.d FROM Boats");
 
-		String tableName = "Boats";
+		FromItem tableName = null;
 		Expression expression = null;
 		SelectItem selectItem = null;
 		if (statement != null) {
 			Select select = (Select) statement;
 			PlainSelect plainSelect = select.getPlainSelect();
-			tableName = plainSelect.getFromItem().toString();
+			tableName = plainSelect.getFromItem();
 			expression = plainSelect.getWhere();
 			List<SelectItem<?>> selectItems = plainSelect.getSelectItems();
 			for(SelectItem<?> item : selectItems){
 				System.out.println(item.getExpression() instanceof Column);
 				System.out.println(item.getExpression() instanceof AllColumns);
 			}
+
+			Operator operator = new ProjectOperator(tableName, null, selectItems);
+			operator.dump();
 		}
 
 		Catalog catalog = Catalog.getInstance();
+
+
 
 
 	}

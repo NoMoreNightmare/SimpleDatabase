@@ -24,6 +24,14 @@ public class TopInterpreter {
         statement = CCJSqlParserUtil.parse(new FileReader(inputFile));
     }
 
+    /**
+     * 临时测试用的方法，到时候删除
+     * @param statement
+     */
+    public void setStatement(Statement statement){
+        this.statement = statement;
+    }
+
     public void dump(){
         if(statement != null){
             QueryConstructor queryConstructor = new QueryConstructor();

@@ -1,5 +1,6 @@
 package Operator;
 
+import net.sf.jsqlparser.statement.select.FromItem;
 import pojo.Parser.SelectExpressionDeParser;
 import pojo.Tuple;
 import net.sf.jsqlparser.expression.Expression;
@@ -8,8 +9,8 @@ public class SelectOperator extends Operator{
 
     ScanOperator scanOperator;
     Expression expression;
-    public SelectOperator(String tableName, Expression expression){
-        this.scanOperator = new ScanOperator(tableName);
+    public SelectOperator(FromItem fromItem, Expression expression){
+        this.scanOperator = new ScanOperator(fromItem);
         this.expression = expression;
     }
     @Override

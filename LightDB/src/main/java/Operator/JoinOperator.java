@@ -1,6 +1,7 @@
 package Operator;
 
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import pojo.Parser.JoinExpressionDeParser;
 import pojo.Parser.SelectExpressionDeParser;
@@ -17,8 +18,9 @@ public class JoinOperator extends Operator{
     Expression expressionJoin;
     Tuple leftTuple;
 
-    public JoinOperator(String tableName, Expression expression, List<Join> joins){
+    public JoinOperator(FromItem fromItem, Expression expression, List<Join> joins){
         //TODO 存储expression
+        String tableName = fromItem.toString();
         JoinExpressionDeParser joinExpressionDeParser = new JoinExpressionDeParser();
         joinExpressionDeParser.setTuple(joins.get(0).toString().toUpperCase());
         Expression expressionSingle = null;
@@ -35,15 +37,15 @@ public class JoinOperator extends Operator{
         //如果joins的长度为1，则不再创建左深连接树，left和right都变成Select Operator
         if(joins.size() == 1){
             if(otherExpression == null){
-                left = new ScanOperator(tableName);
+                left = new ScanOperator(fromItem);
             }else{
-                left = new SelectOperator(tableName, otherExpression);
+                left = new SelectOperator(fromItem, otherExpression);
             }
 
             if(expressionSingle == null){
-                right = new ScanOperator(joins.get(0).toString());
+                right = new ScanOperator(joins.get(0).getFromItem());
             }else{
-                right = new SelectOperator(joins.get(0).toString(), expressionSingle);
+                right = new SelectOperator(joins.get(0).getFromItem(), expressionSingle);
             }
 
         }
@@ -51,12 +53,12 @@ public class JoinOperator extends Operator{
         //如果joins的长度不为1，则获取并移除joins的最后一个table，为其创建select operator；为left则是新的join operator
         else{
             Join join = joins.remove(joins.size() - 1);
-            left = new JoinOperator(tableName, otherExpression, joins);
+            left = new JoinOperator(fromItem, otherExpression, joins);
 
             if(expressionSingle == null){
-                right = new ScanOperator(join.toString());
+                right = new ScanOperator(join.getFromItem());
             }else{
-                right = new SelectOperator(join.toString(), expressionSingle);
+                right = new SelectOperator(join.getFromItem(), expressionSingle);
             }
         }
         //JoinExpressionDeParser每次只把右边的table的相关的expression筛选出来并留下，其他的expression传到left operator里

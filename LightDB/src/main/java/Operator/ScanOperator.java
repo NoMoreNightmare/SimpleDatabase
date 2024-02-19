@@ -1,5 +1,6 @@
 package Operator;
 
+import net.sf.jsqlparser.statement.select.FromItem;
 import pojo.Catalog;
 import pojo.Tuple;
 
@@ -21,8 +22,9 @@ public class ScanOperator extends Operator{
 
 
     //TODO 应该在构造的时候知道要解析的sql文件路径，数据文件的路径和最终输出的路径
-    public ScanOperator(String tableName){
+    public ScanOperator(FromItem fromItem){
         //TODO 获取Catalog来获取各个目录
+        String tableName = fromItem.toString();
         Catalog catalog = Catalog.getInstance();
         String dbFile = catalog.getDbPath() + tableName +".csv";
 
