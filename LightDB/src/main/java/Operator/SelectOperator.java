@@ -1,6 +1,6 @@
 package Operator;
 
-import pojo.MyExpressionDeParser;
+import pojo.Parser.SelectExpressionDeParser;
 import pojo.Tuple;
 import net.sf.jsqlparser.expression.Expression;
 
@@ -19,7 +19,7 @@ public class SelectOperator extends Operator{
             return null;
         }
 
-        MyExpressionDeParser deParser = new MyExpressionDeParser();
+        SelectExpressionDeParser deParser = new SelectExpressionDeParser();
 
         while(true){
             deParser.setTuple(tuple);

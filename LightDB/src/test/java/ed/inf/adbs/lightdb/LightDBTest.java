@@ -1,24 +1,28 @@
 package ed.inf.adbs.lightdb;
 
 import Operator.*;
-import Parser.TopInterpreter;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import org.junit.Test;
 import pojo.Catalog;
+import pojo.Parser.JoinExpressionDeParser;
 import pojo.PropertyInTest;
 import pojo.Tuple;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -123,7 +127,9 @@ public class LightDBTest {
 			PlainSelect plainSelect = select.getPlainSelect();
 			tableName = plainSelect.getFromItem().toString();
 			expression = plainSelect.getWhere();
+
 		}
+
 
 		Catalog catalog = Catalog.getInstance();
 
@@ -136,7 +142,7 @@ public class LightDBTest {
 	@Test
 	public void ProjectOperatorSimpleTest() throws FileNotFoundException, JSQLParserException {
 //		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
-            Statement statement = CCJSqlParserUtil.parse("SELECT e,D FROM BOATS where F = 8");
+            Statement statement = CCJSqlParserUtil.parse("SELECT Boats.e,Boats.D FROM BOATS where Boats.F = 8");
 
 		String tableName = "Boats";
 		Expression expression = null;
@@ -158,9 +164,32 @@ public class LightDBTest {
 	}
 
 	@Test
+	public void JoinOperatorSimpleTest() throws FileNotFoundException, JSQLParserException {
+//		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
+		Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Sailors, Reserves WHERE Sailors.A = Reserves.G;");
+
+		String tableName = "Boats";
+		Expression expression = null;
+		List<SelectItem<?>> selectItems = null;
+		List<Join> joins = null;
+		if (statement != null) {
+			Select select = (Select) statement;
+			PlainSelect plainSelect = select.getPlainSelect();
+			tableName = plainSelect.getFromItem().toString();
+			expression = plainSelect.getWhere();
+			joins = plainSelect.getJoins();
+		}
+
+		Catalog catalog = Catalog.getInstance();
+
+		Operator operator = new JoinOperator(tableName, expression, joins);
+		operator.dump();
+	}
+
+	@Test
 	public void idonknow() throws FileNotFoundException, JSQLParserException {
 //		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
-            Statement statement = CCJSqlParserUtil.parse("SELECT id FROM Boats");
+            Statement statement = CCJSqlParserUtil.parse("SELECT Boats.id FROM Boats");
 
 		String tableName = "Boats";
 		Expression expression = null;
@@ -185,11 +214,50 @@ public class LightDBTest {
 
 	@Test
 	public void idonkknow2() throws FileNotFoundException, JSQLParserException {
+		Statement statement = CCJSqlParserUtil.parse("SELECT Boats.id FROM Boats,Sheep,test where Boats.id = Sheep.id and Boats.id = test.id and Sheep.id = test.id");
+		Select select = (Select) statement;
+		PlainSelect plainSelect = select.getPlainSelect();
+		List<Join> joins = plainSelect.getJoins();
+//		joins.remove(0);
+		System.out.println(joins);
+		AndExpression where =(AndExpression) plainSelect.getWhere();
+		System.out.println(where.getLeftExpression());
+		System.out.println(where.getRightExpression());
+		System.out.println(where.withLeftExpression(where.getRightExpression()));
 
-		TopInterpreter topInterpreter = new TopInterpreter();
-		topInterpreter.parseStatement(PropertyInTest.properties.getProperty("input-path"));
+		System.out.println(new AndExpression().withLeftExpression(new LongValue(1)).withRightExpression(new LongValue(1)).withRightExpression(new LongValue(2)));
 
-		topInterpreter.dump();
+	}
+
+	@Test
+	public void testParser() throws JSQLParserException {
+		Tuple left = new Tuple();
+		left.setTableName("whatever");
+		Tuple right = new Tuple();
+		right.setTableName("TEST");
+
+		Statement statement = CCJSqlParserUtil.parse("SELECT Boats.id FROM Boats,Sheep,test where test.id = boats.id and test.id = test.id and 1 = 2 and test.id = 2 and Boats.id = 2");
+
+		Select select = (Select) statement;
+		PlainSelect plainSelect = select.getPlainSelect();
+
+		JoinExpressionDeParser joinExpressionDeParser = new JoinExpressionDeParser();
+		joinExpressionDeParser.setTuple(right.tableName);
+
+		plainSelect.getWhere().accept(joinExpressionDeParser);
+		System.out.println(joinExpressionDeParser.getThisExpressionSingle());
+		System.out.println(joinExpressionDeParser.getThisExpressionJoin());
+		System.out.println(joinExpressionDeParser.getOtherExpression());
+
+		List<String> column1 = new ArrayList<>();
+		column1.add("1");
+		column1.add("2");
+
+		List<String> column2 = new ArrayList<>();
+		column2.add("3");
+		column2.add("4");
+		column1.addAll(column2);
+		System.out.println(column1);
 	}
 
 

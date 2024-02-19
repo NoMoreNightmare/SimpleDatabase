@@ -36,19 +36,28 @@ public class ProjectOperator extends Operator{
 
         Tuple newTuple = new Tuple();
 
+//        List<String> columns = new ArrayList<>();
+//        List<Integer> values = new ArrayList<>();
+//        for(SelectItem<?> item : selectItem){
+//            String[] variousColumns = item.toString().split("\\.");
+//            String column;
+//            if(variousColumns.length > 1){
+//                column = variousColumns[1];
+//            }else{
+//                column = variousColumns[0];
+//            }
+//
+//            int value = tuple.getValue(column);
+//
+//            columns.add(column);
+//            values.add(value);
+//        }
+
         List<String> columns = new ArrayList<>();
         List<Integer> values = new ArrayList<>();
         for(SelectItem<?> item : selectItem){
-            String[] variousColumns = item.toString().split("\\.");
-            String column;
-            if(variousColumns.length > 1){
-                column = variousColumns[1];
-            }else{
-                column = variousColumns[0];
-            }
-
+            String column = item.toString().toUpperCase();
             int value = tuple.getValue(column);
-
             columns.add(column);
             values.add(value);
         }

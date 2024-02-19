@@ -1,4 +1,4 @@
-package Parser;
+package Interpreter;
 import Operator.*;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.Statement;

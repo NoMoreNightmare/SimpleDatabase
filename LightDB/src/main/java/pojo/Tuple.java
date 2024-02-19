@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 public class Tuple {
+
+
+    public String tableName;
+
     public List<String> columns = new ArrayList<>();
 
     List<Integer> values = new ArrayList<>();
@@ -16,6 +20,10 @@ public class Tuple {
 
     public List<Integer> getValues(){
         return values;
+    }
+
+    public List<String> getColumns() {
+        return columns;
     }
 
     /**
@@ -40,6 +48,14 @@ public class Tuple {
 
     public void setColumns(List<String> columns) {
         this.columns = columns;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 
 

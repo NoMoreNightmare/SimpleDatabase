@@ -1,4 +1,4 @@
-package pojo;
+package pojo.Parser;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -6,15 +6,16 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
+import pojo.Tuple;
 
-public class MyExpressionDeParser extends ExpressionDeParser {
+public class SelectExpressionDeParser extends ExpressionDeParser {
     Tuple tuple;
     boolean result = true;
-    public MyExpressionDeParser(Tuple tuple){
+    public SelectExpressionDeParser(Tuple tuple){
         this.tuple = tuple;
     }
 
-    public MyExpressionDeParser(){
+    public SelectExpressionDeParser(){
 
     }
 
@@ -48,16 +49,8 @@ public class MyExpressionDeParser extends ExpressionDeParser {
             }
         }else if(expression instanceof Column){
             Column column = (Column) expression;
-            String columnName = column.getColumnName();
-            String[] tableAndColumn = columnName.split("\\.");
-            String c;
-            if(tableAndColumn.length > 1){
-                c = tableAndColumn[1];
-            }else{
-                c = tableAndColumn[0];
-            }
-
-            Integer value = tuple.getValue(c);
+            String columnName = column.getFullyQualifiedName().toUpperCase();
+            Integer value = tuple.getValue(columnName);
             if(value == null){
                 throw new RuntimeException("The column doesn't exist");
             }
@@ -78,16 +71,8 @@ public class MyExpressionDeParser extends ExpressionDeParser {
             return num;
         }else if(expression instanceof Column){
             Column column = (Column) expression;
-            String columnName = column.getColumnName();
-            String[] tableAndColumn = columnName.split("\\.");
-            String c;
-            if(tableAndColumn.length > 1){
-                c = tableAndColumn[1];
-            }else{
-                c = tableAndColumn[0];
-            }
-
-            Integer value = tuple.getValue(c);
+            String columnName = column.getFullyQualifiedName().toUpperCase();
+            Integer value = tuple.getValue(columnName);
             if(value == null){
 
                 throw new RuntimeException("The column doesn't exist");

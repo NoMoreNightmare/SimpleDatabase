@@ -17,6 +17,7 @@ public class ScanOperator extends Operator{
 
     List<String> columns;
 
+    String tableName;
 
 
     //TODO 应该在构造的时候知道要解析的sql文件路径，数据文件的路径和最终输出的路径
@@ -58,7 +59,7 @@ public class ScanOperator extends Operator{
             }
         }
 
-        //TODO 初始化Tuple的列
+        //TODO 初始化Tuple的表名和列
         String schema = catalog.getSchemaPath();
         FileReader frSchema = null;
         BufferedReader brSchema = null;
@@ -66,10 +67,15 @@ public class ScanOperator extends Operator{
             frSchema = new FileReader(schema);
             brSchema = new BufferedReader(frSchema);
             String line = brSchema.readLine();
+
+            this.tableName = tableName.toUpperCase();
+
             while(line != null){
                 String[] columnStrings = line.split(" ");
-                for(int i = 0; i < columnStrings.length; i++){
-                    columnStrings[i] = columnStrings[i].toUpperCase();
+                columnStrings[0] = columnStrings[0].toUpperCase();
+
+                for(int i = 1; i < columnStrings.length; i++){
+                    columnStrings[i] = tableName.toUpperCase() + "." + columnStrings[i].toUpperCase();
                 }
                 List<String> tableAndColumn = new ArrayList<>(Arrays.asList(columnStrings));
                 if(tableName.toUpperCase().equals(tableAndColumn.get(0))){
@@ -106,13 +112,13 @@ public class ScanOperator extends Operator{
         Tuple tuple = new Tuple();
         tuple.setValues(values);
         tuple.setColumns(columns);
+        tuple.setTableName(tableName);
         return tuple;
     }
 
     //TODO 从头开始，从这个operator会返回的第一个tuple重新开始
     @Override
     public void reset() {
-        System.out.println("hello");
         index = 0;
     }
 
