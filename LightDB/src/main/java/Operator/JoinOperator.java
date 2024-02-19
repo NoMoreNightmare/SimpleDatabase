@@ -22,7 +22,12 @@ public class JoinOperator extends Operator{
         //TODO 存储expression
         String tableName = fromItem.toString();
         JoinExpressionDeParser joinExpressionDeParser = new JoinExpressionDeParser();
-        joinExpressionDeParser.setTuple(joins.get(0).toString().toUpperCase());
+        if(joins.get(0).getFromItem().getAlias() == null){
+            joinExpressionDeParser.setTuple(joins.get(0).toString().toUpperCase());
+        }else{
+            joinExpressionDeParser.setTuple(joins.get(0).getFromItem().getAlias().toString().trim().toUpperCase());
+        }
+
         Expression expressionSingle = null;
         Expression otherExpression = null;
         if(expression != null){
@@ -31,8 +36,8 @@ public class JoinOperator extends Operator{
             otherExpression = joinExpressionDeParser.getOtherExpression();
         }
 
-
         this.expressionJoin = joinExpressionDeParser.getThisExpressionJoin();
+
 
         //如果joins的长度为1，则不再创建左深连接树，left和right都变成Select Operator
         if(joins.size() == 1){

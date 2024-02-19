@@ -23,8 +23,6 @@ public class QueryConstructor {
 
             List<Join> joins = plainSelect.getJoins();
 
-            Map<String, String> aliases = new HashMap<>();
-
 			GroupByElement groupBy = plainSelect.getGroupBy();
 //			Expression having = plainSelect.getHaving();
 
@@ -35,32 +33,78 @@ public class QueryConstructor {
 
             if(fromItem != null && selectItems != null){
                 //判断是否是project：
+
                 if (selectItems.size() == 1){
                     if(selectItems.get(0).getExpression() instanceof AllColumns){
                         //使用Scan Operator
                         if(where == null){
                             //使用Scan Operator
                             if(joins == null){
-                                return new ScanOperator(fromItem);
+                                if(orderByElements == null){
+                                    return new ScanOperator(fromItem);
+                                }else{
+                                    return new SortOperator(fromItem, orderByElements);
+                                }
+
                             }else{
-                                return new JoinOperator(fromItem, null, joins);
+                                if(orderByElements == null){
+                                    return new JoinOperator(fromItem, null, joins);
+                                }else{
+                                    return new SortOperator(fromItem, null, joins, orderByElements);
+                                }
+
                             }
 
                         }else{
                             //使用Select Operator
                             if(joins == null){
-                                return new SelectOperator(fromItem, where);
+                                if(orderByElements == null){
+                                    return new SelectOperator(fromItem, where);
+                                }else{
+                                    return new SortOperator(fromItem, where, orderByElements);
+                                }
+
                             }else{
-                                return new JoinOperator(fromItem, where, joins);
+                                if(orderByElements == null){
+                                    return new JoinOperator(fromItem, where, joins);
+                                }else{
+                                    return new SortOperator(fromItem, where, joins, orderByElements);
+                                }
+
                             }
 
                         }
                     }else{
                         //使用Project Operator
                         if(joins == null){
+                            if(orderByElements == null){
+                                return new ProjectOperator(fromItem, where, selectItems);
+                            }else{
+                                return new SortOperator(fromItem, where, selectItems, null, orderByElements);
+                            }
+
+                        }else{
+                            if(orderByElements == null){
+                                return new ProjectOperator(fromItem, where, selectItems, joins);
+                            }
+                            else{
+                                return new SortOperator(fromItem, where, selectItems, joins, orderByElements);
+                            }
+                        }
+                    }
+                }else{
+                    if(joins == null){
+                        if(orderByElements == null){
                             return new ProjectOperator(fromItem, where, selectItems);
                         }else{
+                            return new SortOperator(fromItem, where, selectItems, null, orderByElements);
+                        }
+                    }else{
+                        if(orderByElements == null){
                             return new ProjectOperator(fromItem, where, selectItems, joins);
+                        }
+                        else{
+                            return new SortOperator(fromItem, where, selectItems, joins, orderByElements);
                         }
                     }
                 }
@@ -74,6 +118,5 @@ public class QueryConstructor {
             throw new NullPointerException("The statement is null");
         }
 
-        return null;
     }
 }

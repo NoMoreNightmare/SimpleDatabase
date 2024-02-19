@@ -168,12 +168,13 @@ public class LightDBTest {
 	@Test
 	public void JoinOperatorSimpleTest() throws FileNotFoundException, JSQLParserException {
 //		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
-		Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Sailors S, Reserves, Boats;");
+//		Statement statement = CCJSqlParserUtil.parse("SELECT S.A, B.E FROM Sailors S, Reserves R, Boats B where S.A = R.G;");
+		Statement statement = CCJSqlParserUtil.parse("SELECT Sailors.A, Boats.E FROM Sailors, Reserves, Boats where Sailors.A = Reserves.G;");
+//		Statement statement = CCJSqlParserUtil.parse("SELECT E.E, B.E FROM Boats E, Boats B where E.E = B.E;");
 
 		TopInterpreter topInterpreter = new TopInterpreter();
 		topInterpreter.setStatement(statement);
-
-		System.out.println(((Select) statement).getPlainSelect().getFromItem().getAlias());
+		topInterpreter.dump();
 
 
 	}
@@ -256,6 +257,16 @@ public class LightDBTest {
 		column1.addAll(column2);
 		System.out.println(column1);
 	}
+
+	@Test
+	public void testOrder() throws JSQLParserException {
+		Statement statement = CCJSqlParserUtil.parse("SELECT Sailors.A, Boats.E FROM Sailors, Reserves, Boats where Sailors.A = Reserves.G order by Sailors.A, Boats.E;");
+		PlainSelect plainSelect = ((Select)statement).getPlainSelect();
+		SortOperator sortOperator = new SortOperator(plainSelect.getFromItem(), plainSelect.getWhere(), plainSelect.getSelectItems(), plainSelect.getJoins(), plainSelect.getOrderByElements());
+		sortOperator.dump();
+
+	}
+
 
 
 }

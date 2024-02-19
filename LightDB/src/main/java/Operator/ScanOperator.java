@@ -21,12 +21,20 @@ public class ScanOperator extends Operator{
     String tableName;
 
 
+
+
     //TODO 应该在构造的时候知道要解析的sql文件路径，数据文件的路径和最终输出的路径
     public ScanOperator(FromItem fromItem){
         //TODO 获取Catalog来获取各个目录
-        String tableName = fromItem.toString();
+        String tableName;
         Catalog catalog = Catalog.getInstance();
-        String dbFile = catalog.getDbPath() + tableName +".csv";
+
+        if(fromItem.getAlias() == null){
+            tableName = fromItem.toString();
+        }else{
+            tableName = fromItem.toString().split(" ")[0];
+        }
+        String dbFile = catalog.getDbPath() + tableName +".csv";;
 
 
         //TODO 将dbPath和表名拼接，获取数据文件的路径
@@ -77,7 +85,12 @@ public class ScanOperator extends Operator{
                 columnStrings[0] = columnStrings[0].toUpperCase();
 
                 for(int i = 1; i < columnStrings.length; i++){
-                    columnStrings[i] = tableName.toUpperCase() + "." + columnStrings[i].toUpperCase();
+                    if(fromItem.getAlias() == null){
+                        columnStrings[i] = columnStrings[0] + "." + columnStrings[i].toUpperCase();
+                    }else{
+                        columnStrings[i] = fromItem.getAlias().toString().trim().toUpperCase() + "." + columnStrings[i].toUpperCase();
+                    }
+
                 }
                 List<String> tableAndColumn = new ArrayList<>(Arrays.asList(columnStrings));
                 if(tableName.toUpperCase().equals(tableAndColumn.get(0))){
