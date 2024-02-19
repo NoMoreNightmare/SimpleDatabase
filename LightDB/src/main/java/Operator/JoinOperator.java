@@ -93,6 +93,10 @@ public class JoinOperator extends Operator{
             tuple.setValues(values);
 
 
+            if(expressionJoin == null){
+                return tuple;
+            }
+
             deParser.setTuple(tuple);
             this.expressionJoin.accept(deParser);
 

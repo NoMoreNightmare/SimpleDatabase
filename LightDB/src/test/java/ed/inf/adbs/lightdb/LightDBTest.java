@@ -166,7 +166,7 @@ public class LightDBTest {
 	@Test
 	public void JoinOperatorSimpleTest() throws FileNotFoundException, JSQLParserException {
 //		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
-		Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Sailors, Reserves WHERE Sailors.A = Reserves.G;");
+		Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Sailors, Reserves;");
 
 		String tableName = "Boats";
 		Expression expression = null;
