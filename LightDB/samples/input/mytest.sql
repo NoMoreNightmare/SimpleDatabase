@@ -1,5 +1,2 @@
 
-
-
-
-select distinct id,dept from Sailors where S.id = 10 and hello > 9 group by S.id having dept = 100 order by myid desc,dept
+select distinct S.A,S.B from Sailors S where S.A <= 4 and S.B = 100 order by S.B

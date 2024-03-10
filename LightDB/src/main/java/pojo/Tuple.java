@@ -1,9 +1,6 @@
 package pojo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Tuple {
 
@@ -58,5 +55,26 @@ public class Tuple {
         this.tableName = tableName;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Tuple tuple = (Tuple) o;
+        for(int i = 0; i < tuple.getColumns().size(); i++){
+            String column = columns.get(i);
+            if(!this.getValue(column).equals(tuple.getValue(column))){
+                return false;
+            }
+        }
+        return true;
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(values);
+    }
 }

@@ -1,12 +1,11 @@
 package ed.inf.adbs.lightdb;
 
+import Interpreter.QueryConstructor;
 import Interpreter.TopInterpreter;
 import Operator.*;
 import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitor;
-import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.NullValue;
+import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -24,9 +23,7 @@ import javax.security.auth.Refreshable;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static org.junit.Assert.assertTrue;
 
@@ -137,7 +134,8 @@ public class LightDBTest {
 
 
 
-		Operator operator = new SelectOperator(tableName, expression);
+//		Operator operator = new SelectOperator(tableName, expression);
+		Operator operator = new QueryConstructor().constructor(statement);
 		operator.dump();
 	}
 
@@ -161,7 +159,8 @@ public class LightDBTest {
 
 
 
-		Operator operator = new ProjectOperator(tableName, expression, selectItems);
+//		Operator operator = new ProjectOperator(tableName, expression, selectItems);
+		Operator operator = new QueryConstructor().constructor(statement);
 		operator.dump();
 	}
 
@@ -169,13 +168,34 @@ public class LightDBTest {
 	public void JoinOperatorSimpleTest() throws FileNotFoundException, JSQLParserException {
 //		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
 //		Statement statement = CCJSqlParserUtil.parse("SELECT S.A, B.E FROM Sailors S, Reserves R, Boats B where S.A = R.G;");
-		Statement statement = CCJSqlParserUtil.parse("SELECT Sailors.A, Boats.E FROM Sailors, Reserves, Boats where Sailors.A = Reserves.G;");
+		Statement statement = CCJSqlParserUtil.parse("SELECT DISTINCT Sailors.A, Boats.E FROM Sailors, Reserves, Boats where Sailors.A = Reserves.G group by Sailors.A, Boats.E order by Boats.E,Sailors.A;");
 //		Statement statement = CCJSqlParserUtil.parse("SELECT E.E, B.E FROM Boats E, Boats B where E.E = B.E;");
 
 		TopInterpreter topInterpreter = new TopInterpreter();
 		topInterpreter.setStatement(statement);
 		topInterpreter.dump();
 
+
+	}
+
+	@Test
+	public void testDuplicate() throws JSQLParserException {
+		Set<Tuple> tuples = new HashSet<>();
+		Statement statement = CCJSqlParserUtil.parse("SELECT Sailors.B FROM Sailors");
+
+		QueryConstructor queryConstructor = new QueryConstructor();
+		Operator operator = queryConstructor.constructor(statement);
+
+		Tuple tuple = operator.getNextTuple();
+		while(tuple != null){
+			tuples.add(tuple);
+			tuple = operator.getNextTuple();
+		}
+
+		for(Tuple mytuple : tuples){
+//			System.out.println(mytuple);
+			System.out.println(mytuple.getValues());
+		}
 
 	}
 
@@ -198,7 +218,8 @@ public class LightDBTest {
 				System.out.println(item.getExpression() instanceof AllColumns);
 			}
 
-			Operator operator = new ProjectOperator(tableName, null, selectItems);
+//			Operator operator = new ProjectOperator(tableName, null, selectItems);
+			Operator operator = new QueryConstructor().constructor(statement);
 			operator.dump();
 		}
 
@@ -260,10 +281,23 @@ public class LightDBTest {
 
 	@Test
 	public void testOrder() throws JSQLParserException {
-		Statement statement = CCJSqlParserUtil.parse("SELECT Sailors.A, Boats.E FROM Sailors, Reserves, Boats where Sailors.A = Reserves.G order by Sailors.A, Boats.E;");
+//		Statement statement = CCJSqlParserUtil.parse("SELECT Sailors.A, Boats.E FROM Sailors, Reserves, Boats where Sailors.A = Reserves.G order by Sailors.A, Boats.E;");
+//		PlainSelect plainSelect = ((Select)statement).getPlainSelect();
+//		SortOperator sortOperator = new SortOperator(plainSelect.getFromItem(), plainSelect.getWhere(), plainSelect.getSelectItems(), plainSelect.getJoins(), plainSelect.getOrderByElements());
+//		sortOperator.dump();
+
+		Statement statement = CCJSqlParserUtil.parse("SELECT sum(Sailors.A) FROM Sailors, Reserves, Boats " +
+				"where Sailors.A = Reserves.G group by Sailors.A, Boats.E order by Sailors.A, Boats.E;");
 		PlainSelect plainSelect = ((Select)statement).getPlainSelect();
-		SortOperator sortOperator = new SortOperator(plainSelect.getFromItem(), plainSelect.getWhere(), plainSelect.getSelectItems(), plainSelect.getJoins(), plainSelect.getOrderByElements());
-		sortOperator.dump();
+		List<SelectItem<?>> selectItems = plainSelect.getSelectItems();
+		if(selectItems.get(0).getExpression() instanceof Function){
+			Function function = (Function) selectItems.get(0).getExpression();
+			System.out.println(function.getParameters().get(0) instanceof Multiplication);
+			System.out.println(function.getParameters().get(0) instanceof Column);
+			Multiplication multiplication = (Multiplication) function.getParameters().get(0);
+			System.out.println(multiplication.getLeftExpression());
+		}
+		System.out.println(plainSelect.getGroupBy().getGroupByExpressionList());
 
 	}
 

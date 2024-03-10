@@ -14,20 +14,15 @@ public class ProjectOperator extends Operator{
     Operator operator;
     List<SelectItem<?>> selectItem;
 
-    public ProjectOperator(FromItem fromItem, Expression expression, List<SelectItem<?>> selectItem){
-        if(expression == null){
-            this.operator = new ScanOperator(fromItem);
-        }else{
-            this.operator = new SelectOperator(fromItem, expression);
-        }
-
+    public ProjectOperator(List<SelectItem<?>> selectItem, Operator operator){
+        this.operator = operator;
         this.selectItem = selectItem;
     }
 
-    public ProjectOperator(FromItem fromItem, Expression expression, List<SelectItem<?>> selectItem, List<Join> joins){
-        this.operator = new JoinOperator(fromItem, expression, joins);
-        this.selectItem = selectItem;
-    }
+//    public ProjectOperator(FromItem fromItem, Expression expression, List<SelectItem<?>> selectItem, List<Join> joins){
+//        this.operator = new JoinOperator(fromItem, expression, joins);
+//        this.selectItem = selectItem;
+//    }
 
     @Override
     public Tuple getNextTuple() {

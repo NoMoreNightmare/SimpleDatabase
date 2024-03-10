@@ -7,15 +7,15 @@ import net.sf.jsqlparser.expression.Expression;
 
 public class SelectOperator extends Operator{
 
-    ScanOperator scanOperator;
+    Operator operator;
     Expression expression;
-    public SelectOperator(FromItem fromItem, Expression expression){
-        this.scanOperator = new ScanOperator(fromItem);
+    public SelectOperator(Expression expression, Operator operator){
+        this.operator = operator;
         this.expression = expression;
     }
     @Override
     public Tuple getNextTuple() {
-        Tuple tuple = scanOperator.getNextTuple();
+        Tuple tuple = operator.getNextTuple();
         if(tuple == null){
             return null;
         }
@@ -29,7 +29,7 @@ public class SelectOperator extends Operator{
                 return tuple;
             }
             deParser.reset();
-            tuple = scanOperator.getNextTuple();
+            tuple = operator.getNextTuple();
             if(tuple == null){
                 return null;
             }
@@ -39,6 +39,6 @@ public class SelectOperator extends Operator{
 
     @Override
     public void reset() {
-        scanOperator.reset();
+        operator.reset();
     }
 }
