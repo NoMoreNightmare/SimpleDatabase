@@ -286,18 +286,29 @@ public class LightDBTest {
 //		SortOperator sortOperator = new SortOperator(plainSelect.getFromItem(), plainSelect.getWhere(), plainSelect.getSelectItems(), plainSelect.getJoins(), plainSelect.getOrderByElements());
 //		sortOperator.dump();
 
-		Statement statement = CCJSqlParserUtil.parse("SELECT sum(Sailors.A) FROM Sailors, Reserves, Boats " +
+		Statement statement = CCJSqlParserUtil.parse("SELECT sum(Sailors.A*Sailors.A*Sailors.A) FROM Sailors, Reserves, Boats " +
 				"where Sailors.A = Reserves.G group by Sailors.A, Boats.E order by Sailors.A, Boats.E;");
 		PlainSelect plainSelect = ((Select)statement).getPlainSelect();
 		List<SelectItem<?>> selectItems = plainSelect.getSelectItems();
-		if(selectItems.get(0).getExpression() instanceof Function){
-			Function function = (Function) selectItems.get(0).getExpression();
-			System.out.println(function.getParameters().get(0) instanceof Multiplication);
-			System.out.println(function.getParameters().get(0) instanceof Column);
-			Multiplication multiplication = (Multiplication) function.getParameters().get(0);
-			System.out.println(multiplication.getLeftExpression());
-		}
-		System.out.println(plainSelect.getGroupBy().getGroupByExpressionList());
+		List<OrderByElement> orderByElements = plainSelect.getOrderByElements();
+//		if(selectItems.get(0).getExpression() instanceof Function){
+//			Function function = (Function) selectItems.get(0).getExpression();
+//			System.out.println(function.getParameters().get(0) instanceof Multiplication);
+//			System.out.println(function.getParameters().get(0) instanceof Column);
+//			Multiplication multiplication = (Multiplication) function.getParameters().get(0);
+//			System.out.println(multiplication.getLeftExpression().toString().equals(orderByElements.get(0).getExpression().toString()));
+////			System.out.println(((Multiplication)function.getParameters().get(0)).getLeftExpression());
+//
+//		}
+//		System.out.println(plainSelect.getGroupBy().getGroupByExpressionList().get(0).toString());
+		TopInterpreter top = new TopInterpreter();
+		top.setStatement(statement);
+		top.dump();
+
+	}
+
+	@Test
+	public void testProvidedSQL(){
 
 	}
 

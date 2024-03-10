@@ -2,6 +2,7 @@ package Interpreter;
 import Operator.*;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
@@ -55,10 +56,10 @@ public class QueryConstructor {
 
             Operator second;
 
-            if(groupBy == null){
+            if(groupBy == null && !(selectItems.get(selectItems.size() - 1).getExpression() instanceof Function)){
                 second = first;
             }else{
-                second = new SumOperator(groupBy, first);
+                second = new SumOperator(groupBy, selectItems, first);
             }
 
             Operator third;
