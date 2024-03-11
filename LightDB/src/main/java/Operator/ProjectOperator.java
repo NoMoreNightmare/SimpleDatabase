@@ -5,14 +5,23 @@ import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.SelectItem;
+import pojo.PropertyInTest;
 import pojo.Tuple;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectOperator extends Operator{
     Operator operator;
     List<SelectItem<?>> selectItem;
+
+    boolean materialized = false;
 
     public ProjectOperator(List<SelectItem<?>> selectItem, Operator operator){
         this.operator = operator;
@@ -67,6 +76,7 @@ public class ProjectOperator extends Operator{
 
         newTuple.setColumns(columns);
         newTuple.setValues(values);
+        newTuple.setTableName(tuple.getTableName());
 
         return newTuple;
 
@@ -77,4 +87,6 @@ public class ProjectOperator extends Operator{
     public void reset() {
         operator.reset();
     }
+
+
 }

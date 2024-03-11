@@ -15,6 +15,8 @@ import net.sf.jsqlparser.statement.select.*;
 import pojo.Parser.JoinExpressionDeParser;
 import pojo.Parser.MultiplicationDeParser;
 
+import javax.print.DocFlavor;
+import java.io.IOException;
 import java.util.*;
 
 public class QueryConstructor {
@@ -40,16 +42,18 @@ public class QueryConstructor {
 
             List<OrderByElement> orderByElements = plainSelect.getOrderByElements();
 
+            boolean materialized = true;
+
             Operator first;
 
             if(joins == null){
-                first = constructScanSelect(fromItem, expression);
+                first = constructScanSelect(fromItem, expression, false);
             }else{
 //                SelectItem<Expression> selectItem = new SelectItem<>();
 //                selectItem.setExpression(expression);
 
                 if(selectItems.size() == 1 && selectItems.get(0).getExpression() instanceof AllColumns){
-                    first = recursiveConstructJoin(fromItem, expression, joins);
+                    first = recursiveConstructJoin(fromItem, expression, joins, false);
                 }else{
                     Map<String, Column> projectionPush = new HashMap<>();
                     if(groupBy != null){
@@ -89,9 +93,7 @@ public class QueryConstructor {
                     }
 
 
-
-
-                    first = recursiveConstructJoin(fromItem, expression, joins, projectionPush);
+                    first = recursiveConstructJoin(fromItem, expression, joins, projectionPush, materialized);
                 }
 
 
@@ -280,14 +282,14 @@ public class QueryConstructor {
 //        return new JoinOperator(expressionJoin, left, right);
 //
 //    }
-    private Operator recursiveConstructJoin(FromItem fromItem, Expression expression, List<Join> joins) {
+    private Operator recursiveConstructJoin(FromItem fromItem, Expression expression, List<Join> joins, boolean materialized) {
         JoinExpressionDeParser joinExpressionDeParser = new JoinExpressionDeParser();
         String tableName;
-        if(joins.get(0).getFromItem().getAlias() == null){
-            tableName = joins.get(0).toString().toUpperCase();
+        if(joins.get(joins.size() - 1).getFromItem().getAlias() == null){
+            tableName = joins.get(joins.size() - 1).toString().toUpperCase();
             joinExpressionDeParser.setTuple(tableName);
         }else{
-            tableName = joins.get(0).getFromItem().getAlias().toString().trim().toUpperCase();
+            tableName = joins.get(joins.size() - 1).getFromItem().getAlias().toString().trim().toUpperCase();
             joinExpressionDeParser.setTuple(tableName);
         }
 
@@ -306,16 +308,16 @@ public class QueryConstructor {
 
         //如果joins的长度为1，则不再创建左深连接树，left和right都变成Select Operator
         if(joins.size() == 1){
-            left = constructScanSelect(fromItem, otherExpression);
-            right = constructScanSelect(joins.get(0).getFromItem(), expressionSingle);
+            left = constructScanSelect(fromItem, otherExpression, false);
+            right = constructScanSelect(joins.get(0).getFromItem(), expressionSingle, materialized);
 
         }
 
         //如果joins的长度不为1，则获取并移除joins的最后一个table，为其创建select operator；为left则是新的join operator
         else{
             Join join = joins.remove(joins.size() - 1);
-            left = recursiveConstructJoin(fromItem, otherExpression,  joins);
-            right = constructScanSelect(join.getFromItem(), expressionSingle);
+            left = recursiveConstructJoin(fromItem, otherExpression, joins, materialized);
+            right = constructScanSelect(join.getFromItem(), expressionSingle, materialized);
         }
 
         return new JoinOperator(expressionJoin, left, right);
@@ -323,14 +325,14 @@ public class QueryConstructor {
     }
 
 
-    private Operator recursiveConstructJoin(FromItem fromItem, Expression expression, List<Join> joins, Map<String, Column> projections) {
+    private Operator recursiveConstructJoin(FromItem fromItem, Expression expression, List<Join> joins, Map<String, Column> projections, boolean materialized) {
         JoinExpressionDeParser joinExpressionDeParser = new JoinExpressionDeParser();
         String rightTableName;
-        if(joins.get(0).getFromItem().getAlias() == null){
-            rightTableName = joins.get(0).toString().toUpperCase();
+        if(joins.get(joins.size() - 1).getFromItem().getAlias() == null){
+            rightTableName = joins.get(joins.size() - 1).toString().toUpperCase();
             joinExpressionDeParser.setTuple(rightTableName);
         }else{
-            rightTableName = joins.get(0).getFromItem().getAlias().toString().trim().toUpperCase();
+            rightTableName = joins.get(joins.size() - 1).getFromItem().getAlias().toString().trim().toUpperCase();
             joinExpressionDeParser.setTuple(rightTableName);
         }
 
@@ -350,15 +352,24 @@ public class QueryConstructor {
         List<SelectItem<?>> rightItems = new ArrayList<>();
 
         Set<String> keys =  result.keySet();
+        List<String> deleted = new ArrayList<>();
         for(String columnName : keys){
             SelectItem<?> selectItem = new SelectItem<>(result.get(columnName));
-            if(columnName.equals(rightTableName)){
+            if(columnName.split("\\.")[0].equals(rightTableName)){
+
                 rightItems.add(selectItem);
 //                result.remove(columnName);
+                deleted.add(columnName);
             }else{
                 leftItems.add(selectItem);
             }
         }
+
+
+        for(String columnName : deleted){
+            result.remove(columnName);
+        }
+
 
 
 //        for(String columnName : result){
@@ -371,16 +382,15 @@ public class QueryConstructor {
 
         //如果joins的长度为1，则不再创建左深连接树，left和right都变成Select Operator
         if(joins.size() == 1){
-            left = constructScanSelectProject(fromItem, otherExpression, leftItems);
-            right = constructScanSelectProject(joins.get(0).getFromItem(), expressionSingle, rightItems);
-
+            left = constructScanSelectProject(fromItem, otherExpression, leftItems, false);
+            right = constructScanSelectProject(joins.get(0).getFromItem(), expressionSingle, rightItems, materialized);
         }
 
         //如果joins的长度不为1，则获取并移除joins的最后一个table，为其创建select operator；为left则是新的join operator
         else{
             Join join = joins.remove(joins.size() - 1);
-            left = recursiveConstructJoin(fromItem, otherExpression,  joins, result);
-            right = constructScanSelectProject(join.getFromItem(), expressionSingle, rightItems);
+            left = recursiveConstructJoin(fromItem, otherExpression,  joins, result, materialized);
+            right = constructScanSelectProject(join.getFromItem(), expressionSingle, rightItems, materialized);
         }
 
         return new JoinOperator(expressionJoin, left, right);
@@ -388,12 +398,16 @@ public class QueryConstructor {
     }
 
 
-    private Operator constructScanSelect(FromItem fromItem, Expression expression){
+    private Operator constructScanSelect(FromItem fromItem, Expression expression, boolean materialized){
         Operator first;
         Operator scan = new ScanOperator(fromItem);
         Operator selection = null;
         if(expression != null){
-            selection = new SelectOperator(expression, scan);
+            if(materialized){
+                selection = new SelectOperatorMaterialized(expression, scan);
+            }else{
+                selection = new SelectOperator(expression, scan);
+            }
         }
 
 
@@ -404,22 +418,38 @@ public class QueryConstructor {
         }
 
 
+
         return first;
     }
 
-    private Operator constructScanSelectProject(FromItem fromItem, Expression expression, List<SelectItem<?>> selectItems){
+    private Operator constructScanSelectProject(FromItem fromItem, Expression expression, List<SelectItem<?>> selectItems, boolean materialized){
         Operator first;
         Operator scan = new ScanOperator(fromItem);
         Operator selection = null;
         if(expression != null){
-            selection = new SelectOperator(expression, scan);
+            if(materialized){
+                selection = new SelectOperatorMaterialized(expression, scan);
+            }else{
+                selection = new SelectOperator(expression, scan);
+            }
+
         }
 
         if(selectItems != null){
             if(selection == null){
-                first = new ProjectOperator(selectItems, scan);
+                if(materialized){
+                    first = new ProjectOperatorMaterialized(selectItems, scan);
+                }else{
+                    first = new ProjectOperator(selectItems, scan);
+                }
+
             }else{
-                first = new ProjectOperator(selectItems, selection);
+                if(materialized){
+                    first = new ProjectOperatorMaterialized(selectItems, selection);
+                }else{
+                    first = new ProjectOperator(selectItems, selection);
+                }
+
             }
         }else{
             if(selection == null){
@@ -428,6 +458,9 @@ public class QueryConstructor {
                 first = selection;
             }
         }
+
+
+
 
         return first;
     }

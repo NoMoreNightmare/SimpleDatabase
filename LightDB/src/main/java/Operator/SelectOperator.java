@@ -2,13 +2,21 @@ package Operator;
 
 import net.sf.jsqlparser.statement.select.FromItem;
 import pojo.Parser.SelectExpressionDeParser;
+import pojo.PropertyInTest;
 import pojo.Tuple;
 import net.sf.jsqlparser.expression.Expression;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class SelectOperator extends Operator{
 
     Operator operator;
     Expression expression;
+
+
+
     public SelectOperator(Expression expression, Operator operator){
         this.operator = operator;
         this.expression = expression;
@@ -41,4 +49,5 @@ public class SelectOperator extends Operator{
     public void reset() {
         operator.reset();
     }
+
 }

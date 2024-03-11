@@ -20,9 +20,7 @@ import pojo.PropertyInTest;
 import pojo.Tuple;
 
 import javax.security.auth.Refreshable;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 import static org.junit.Assert.assertTrue;
@@ -301,9 +299,15 @@ public class LightDBTest {
 //
 //		}
 //		System.out.println(plainSelect.getGroupBy().getGroupByExpressionList().get(0).toString());
-		TopInterpreter top = new TopInterpreter();
-		top.setStatement(statement);
-		top.dump();
+//		TopInterpreter top = new TopInterpreter();
+//		top.setStatement(statement);
+//		top.dump();
+
+		Operator operator = new QueryConstructor().constructor(statement);
+		operator.dump();
+		operator.reset();
+		System.out.println("---------------------------");
+		operator.dump();
 
 	}
 
@@ -314,6 +318,26 @@ public class LightDBTest {
 		TopInterpreter topInterpreter = new TopInterpreter();
 		topInterpreter.setStatement(statement);
 		topInterpreter.dump();
+
+	}
+
+	@Test
+	public void buffer() throws IOException {
+		FileWriter fw = new FileWriter("azhe.csv");
+		fw.write("wqq,");
+		fw.write("wqq\n");
+		fw.write("1,");
+		fw.write("2\n");
+		fw.flush();
+		fw.close();
+	}
+
+	@Test
+	public void createDir(){
+		File file = new File(PropertyInTest.properties.getProperty("temp-path"));
+		if(!file.exists()){
+			file.mkdir();
+		}
 
 	}
 

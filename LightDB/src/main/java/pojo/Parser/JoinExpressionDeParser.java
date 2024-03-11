@@ -120,8 +120,8 @@ public class JoinExpressionDeParser extends ExpressionDeParser {
                                 AndExpression andExpression = new AndExpression(thisExpressionJoin, expression);
                                 thisExpressionJoin = andExpression;
                             }
-                            required.put(newLeft, leftColumn);
-                            required.put(newRight, rightColumn);
+                            required.put(leftColumn.getFullyQualifiedName().toUpperCase(), leftColumn);
+                            required.put(rightColumn.getFullyQualifiedName().toUpperCase(), rightColumn);
                         }
                     }else{
                         if(thisExpressionJoin == null){
@@ -130,8 +130,8 @@ public class JoinExpressionDeParser extends ExpressionDeParser {
                             AndExpression andExpression = new AndExpression(thisExpressionJoin, expression);
                             thisExpressionJoin = andExpression;
                         }
-                        required.put(newLeft, leftColumn);
-                        required.put(newRight, rightColumn);
+                        required.put(leftColumn.getFullyQualifiedName().toUpperCase(), leftColumn);
+                        required.put(rightColumn.getFullyQualifiedName().toUpperCase(), rightColumn);
                     }
                 }else{
                     if(otherExpression == null){
