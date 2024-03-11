@@ -110,80 +110,60 @@ public class JoinExpressionDeParser extends ExpressionDeParser {
                             if(thisExpressionSingle == null){
                                 thisExpressionSingle = expression;
                             }else{
-                                AndExpression andExpression = new AndExpression(thisExpressionSingle, expression);
-                                thisExpressionSingle = andExpression;
+                                thisExpressionSingle = new AndExpression(thisExpressionSingle, expression);
                             }
                         }else{
-                            if(thisExpressionJoin == null){
-                                thisExpressionJoin = expression;
-                            }else{
-                                AndExpression andExpression = new AndExpression(thisExpressionJoin, expression);
-                                thisExpressionJoin = andExpression;
-                            }
-                            required.put(leftColumn.getFullyQualifiedName().toUpperCase(), leftColumn);
-                            required.put(rightColumn.getFullyQualifiedName().toUpperCase(), rightColumn);
+                            calculateJoinConditions(expression, leftColumn, rightColumn);
                         }
                     }else{
-                        if(thisExpressionJoin == null){
-                            thisExpressionJoin = expression;
-                        }else{
-                            AndExpression andExpression = new AndExpression(thisExpressionJoin, expression);
-                            thisExpressionJoin = andExpression;
-                        }
-                        required.put(leftColumn.getFullyQualifiedName().toUpperCase(), leftColumn);
-                        required.put(rightColumn.getFullyQualifiedName().toUpperCase(), rightColumn);
+                        calculateJoinConditions(expression, leftColumn, rightColumn);
                     }
                 }else{
                     if(otherExpression == null){
                         otherExpression = expression;
                     }else{
-                        AndExpression andExpression = new AndExpression(otherExpression, expression);
-                        otherExpression = andExpression;
+                        otherExpression = new AndExpression(otherExpression, expression);
                     }
                 }
             }else{
-                String newLeft =((Column) left).getTable().toString().toUpperCase();
-                if(newLeft.equals(rightTuple)){
-                    if(thisExpressionSingle == null){
-                        thisExpressionSingle = expression;
-                    }else{
-                        AndExpression andExpression = new AndExpression(thisExpressionSingle, expression);
-                        thisExpressionSingle = andExpression;
-                    }
-                }else{
-                    if(otherExpression == null){
-                        otherExpression = expression;
-                    }else{
-                        AndExpression andExpression = new AndExpression(otherExpression, expression);
-                        otherExpression = andExpression;
-                    }
-                }
+                separateConditions(expression, (Column) left);
             }
         }else{
             if(right instanceof Column){
-                String newRight =((Column) right).getTable().toString().toUpperCase();
-                if(newRight.equals(rightTuple)){
-                    if(thisExpressionSingle == null){
-                        thisExpressionSingle = expression;
-                    }else{
-                        AndExpression andExpression = new AndExpression(thisExpressionSingle, expression);
-                        thisExpressionSingle = andExpression;
-                    }
-                }else{
-                    if(otherExpression == null){
-                        otherExpression = expression;
-                    }else{
-                        AndExpression andExpression = new AndExpression(otherExpression, expression);
-                        otherExpression = andExpression;
-                    }
-                }
+                separateConditions(expression, (Column) right);
             }else{
                 if(thisExpressionSingle == null){
                     thisExpressionSingle = expression;
                 }else{
-                    AndExpression andExpression = new AndExpression(thisExpressionSingle, expression);
-                    thisExpressionSingle = andExpression;
+                    thisExpressionSingle = new AndExpression(thisExpressionSingle, expression);
                 }
+            }
+        }
+    }
+
+    private void calculateJoinConditions(Expression expression, Column leftColumn, Column rightColumn) {
+        if(thisExpressionJoin == null){
+            thisExpressionJoin = expression;
+        }else{
+            thisExpressionJoin = new AndExpression(thisExpressionJoin, expression);
+        }
+        required.put(leftColumn.getFullyQualifiedName().toUpperCase(), leftColumn);
+        required.put(rightColumn.getFullyQualifiedName().toUpperCase(), rightColumn);
+    }
+
+    private void separateConditions(Expression expression, Column left) {
+        String newLeft = left.getTable().toString().toUpperCase();
+        if(newLeft.equals(rightTuple)){
+            if(thisExpressionSingle == null){
+                thisExpressionSingle = expression;
+            }else{
+                thisExpressionSingle = new AndExpression(thisExpressionSingle, expression);
+            }
+        }else{
+            if(otherExpression == null){
+                otherExpression = expression;
+            }else{
+                otherExpression = new AndExpression(otherExpression, expression);
             }
         }
     }
