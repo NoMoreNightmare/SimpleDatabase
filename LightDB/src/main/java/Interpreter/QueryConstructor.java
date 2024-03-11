@@ -2,16 +2,20 @@ package Interpreter;
 import Operator.*;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+import net.sf.jsqlparser.parser.SimpleNode;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import pojo.Parser.JoinExpressionDeParser;
+import pojo.Parser.MultiplicationDeParser;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class QueryConstructor {
     public Operator constructor(Statement statement){
@@ -41,17 +45,56 @@ public class QueryConstructor {
             if(joins == null){
                 first = constructScanSelect(fromItem, expression);
             }else{
-//                if(selectItems.size() == 1 && selectItems.get(0).getExpression() instanceof AllColumns){
-//                    first = recursiveConstructJoin(fromItem, expression, selectItems, joins);
-//                }else{
-//                    List<SelectItem<?>> filter = selectItems;
-//
-//
-//
-////                    first = recursiveConstructJoin()
-//                }
+//                SelectItem<Expression> selectItem = new SelectItem<>();
+//                selectItem.setExpression(expression);
 
-                first = recursiveConstructJoin(fromItem, expression, joins);
+                if(selectItems.size() == 1 && selectItems.get(0).getExpression() instanceof AllColumns){
+                    first = recursiveConstructJoin(fromItem, expression, joins);
+                }else{
+                    Map<String, Column> projectionPush = new HashMap<>();
+                    if(groupBy != null){
+                        ExpressionList expressionsList = groupBy.getGroupByExpressionList();
+                        for(Object o : expressionsList){
+                            Column newExpression = (Column) o;
+
+                            projectionPush.put(newExpression.getFullyQualifiedName().toUpperCase(), newExpression);
+                        }
+                    }
+
+                    if(orderByElements != null){
+                        for(OrderByElement order : orderByElements){
+                            Column column = (Column) order.getExpression();
+                            projectionPush.put(column.getFullyQualifiedName().toUpperCase(), column);
+                        }
+                    }
+
+                    for(SelectItem<?> item : selectItems){
+                        if(item.getExpression() instanceof Column column){
+                            projectionPush.put(column.getFullyQualifiedName().toUpperCase(), column);
+                        }else if(item.getExpression() instanceof Function function){
+                            Object o = function.getParameters().get(0);
+                            if(o instanceof Multiplication multiplication){
+                                MultiplicationDeParser deParser = new MultiplicationDeParser();
+                                multiplication.accept(deParser);
+                                List<Expression> expressions = deParser.getExpressions();
+                                for(Expression newExpression : expressions){
+                                    if(newExpression instanceof Column column){
+                                        projectionPush.put(column.getFullyQualifiedName().toUpperCase(), column);
+                                    }
+                                }
+                            }else if(o instanceof Column column){
+                                projectionPush.put(column.getFullyQualifiedName().toUpperCase(), column);
+                            }
+                        }
+                    }
+
+
+
+
+                    first = recursiveConstructJoin(fromItem, expression, joins, projectionPush);
+                }
+
+
             }
 
             Operator second;
@@ -273,6 +316,71 @@ public class QueryConstructor {
             Join join = joins.remove(joins.size() - 1);
             left = recursiveConstructJoin(fromItem, otherExpression,  joins);
             right = constructScanSelect(join.getFromItem(), expressionSingle);
+        }
+
+        return new JoinOperator(expressionJoin, left, right);
+
+    }
+
+
+    private Operator recursiveConstructJoin(FromItem fromItem, Expression expression, List<Join> joins, Map<String, Column> projections) {
+        JoinExpressionDeParser joinExpressionDeParser = new JoinExpressionDeParser();
+        String rightTableName;
+        if(joins.get(0).getFromItem().getAlias() == null){
+            rightTableName = joins.get(0).toString().toUpperCase();
+            joinExpressionDeParser.setTuple(rightTableName);
+        }else{
+            rightTableName = joins.get(0).getFromItem().getAlias().toString().trim().toUpperCase();
+            joinExpressionDeParser.setTuple(rightTableName);
+        }
+
+        Expression expressionSingle = null;
+        Expression otherExpression = null;
+        if(expression != null){
+            expression.accept(joinExpressionDeParser);
+            expressionSingle = joinExpressionDeParser.getThisExpressionSingle();
+            otherExpression = joinExpressionDeParser.getOtherExpression();
+        }
+
+        Expression expressionJoin = joinExpressionDeParser.getThisExpressionJoin();
+        Map<String, Column> result = joinExpressionDeParser.getRequired();
+        result.putAll(projections);
+
+        List<SelectItem<?>> leftItems = new ArrayList<>();
+        List<SelectItem<?>> rightItems = new ArrayList<>();
+
+        Set<String> keys =  result.keySet();
+        for(String columnName : keys){
+            SelectItem<?> selectItem = new SelectItem<>(result.get(columnName));
+            if(columnName.equals(rightTableName)){
+                rightItems.add(selectItem);
+//                result.remove(columnName);
+            }else{
+                leftItems.add(selectItem);
+            }
+        }
+
+
+//        for(String columnName : result){
+//            Column column = new Column();
+//            new Table("")
+//        }
+
+        Operator left;
+        Operator right;
+
+        //如果joins的长度为1，则不再创建左深连接树，left和right都变成Select Operator
+        if(joins.size() == 1){
+            left = constructScanSelectProject(fromItem, otherExpression, leftItems);
+            right = constructScanSelectProject(joins.get(0).getFromItem(), expressionSingle, rightItems);
+
+        }
+
+        //如果joins的长度不为1，则获取并移除joins的最后一个table，为其创建select operator；为left则是新的join operator
+        else{
+            Join join = joins.remove(joins.size() - 1);
+            left = recursiveConstructJoin(fromItem, otherExpression,  joins, result);
+            right = constructScanSelectProject(join.getFromItem(), expressionSingle, rightItems);
         }
 
         return new JoinOperator(expressionJoin, left, right);

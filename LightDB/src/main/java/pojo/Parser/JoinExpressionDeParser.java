@@ -10,10 +10,7 @@ import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import pojo.Tuple;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JoinExpressionDeParser extends ExpressionDeParser {
 //    Tuple leftTuple;
@@ -21,6 +18,7 @@ public class JoinExpressionDeParser extends ExpressionDeParser {
     Expression thisExpressionSingle;
     Expression thisExpressionJoin;
     Expression otherExpression;
+    Map<String, Column> required = new HashMap<>();
     public JoinExpressionDeParser(String rightTuple){
         this.rightTuple = rightTuple;
     }
@@ -101,10 +99,10 @@ public class JoinExpressionDeParser extends ExpressionDeParser {
     }
 
     private void concatExpression(Expression expression, Expression left, Expression right) {
-        if(left instanceof Column){
-            if(right instanceof Column){
-                String newLeft =((Column) left).getTable().toString().toUpperCase();
-                String newRight = ((Column) right).getTable().toString().toUpperCase();
+        if(left instanceof Column leftColumn){
+            if(right instanceof Column rightColumn){
+                String newLeft = leftColumn.getTable().toString().toUpperCase();
+                String newRight = rightColumn.getTable().toString().toUpperCase();
 
                 if(newLeft.equals(rightTuple) || newRight.equals(rightTuple)){
                     if(newLeft.equals(rightTuple)){
@@ -122,6 +120,8 @@ public class JoinExpressionDeParser extends ExpressionDeParser {
                                 AndExpression andExpression = new AndExpression(thisExpressionJoin, expression);
                                 thisExpressionJoin = andExpression;
                             }
+                            required.put(newLeft, leftColumn);
+                            required.put(newRight, rightColumn);
                         }
                     }else{
                         if(thisExpressionJoin == null){
@@ -130,6 +130,8 @@ public class JoinExpressionDeParser extends ExpressionDeParser {
                             AndExpression andExpression = new AndExpression(thisExpressionJoin, expression);
                             thisExpressionJoin = andExpression;
                         }
+                        required.put(newLeft, leftColumn);
+                        required.put(newRight, rightColumn);
                     }
                 }else{
                     if(otherExpression == null){
@@ -225,5 +227,11 @@ public class JoinExpressionDeParser extends ExpressionDeParser {
 
         concatExpression(expression, left, right);
     }
+
+    public Map<String, Column> getRequired() {
+        return required;
+    }
+
+
 
 }
