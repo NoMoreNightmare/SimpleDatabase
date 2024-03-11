@@ -341,6 +341,12 @@ public class LightDBTest {
 
 	}
 
+	@Test
+	public void testLoop() throws JSQLParserException {
+		Statement statement = CCJSqlParserUtil.parse("select sum(S1.C*S2.B) from Sailors S1, Sailors S2, Sailors S3 where S1.A <= 4 and S2.B = 100 and S3.C >= 100 group by S1.C order by S1.C");
+		Operator operator = new QueryConstructor().constructor(statement);
+		operator.dump();
+	}
 
 
 }

@@ -100,7 +100,7 @@ public class SelectOperatorMaterialized extends SelectOperator{
 
             while(tuple != null){
                 List<Integer> values = tuple.getValues();
-//                index = 0;
+                index = 0;
                 if(values.size() == 0){
                     bw.write("1\n");
                     tuple = super.getNextTuple();
