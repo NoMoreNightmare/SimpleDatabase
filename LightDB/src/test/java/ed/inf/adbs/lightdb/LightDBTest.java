@@ -308,7 +308,12 @@ public class LightDBTest {
 	}
 
 	@Test
-	public void testProvidedSQL(){
+	public void testProvidedSQL() throws FileNotFoundException, JSQLParserException {
+		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
+
+		TopInterpreter topInterpreter = new TopInterpreter();
+		topInterpreter.setStatement(statement);
+		topInterpreter.dump();
 
 	}
 
