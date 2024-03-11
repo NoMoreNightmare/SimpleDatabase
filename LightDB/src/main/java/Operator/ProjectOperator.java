@@ -69,9 +69,15 @@ public class ProjectOperator extends Operator{
         List<Integer> values = new ArrayList<>();
         for(SelectItem<?> item : selectItem){
             String column = item.toString().toUpperCase();
-            int value = tuple.getValue(column);
-            columns.add(column);
-            values.add(value);
+            if("*".equals(column)){
+                columns.addAll(tuple.getColumns());
+                values.addAll(tuple.getValues());
+            }else{
+                int value = tuple.getValue(column);
+                columns.add(column);
+                values.add(value);
+            }
+
         }
 
         newTuple.setColumns(columns);

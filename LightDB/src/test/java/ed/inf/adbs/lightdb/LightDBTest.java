@@ -333,11 +333,10 @@ public class LightDBTest {
 	}
 
 	@Test
-	public void createDir(){
-		File file = new File(PropertyInTest.properties.getProperty("temp-path"));
-		if(!file.exists()){
-			file.mkdir();
-		}
+	public void additionalSum() throws JSQLParserException {
+		Statement statement = CCJSqlParserUtil.parse("select *,sum(S.A) from Sailors S group by S.A, S.B, S.C");
+		Operator operator = new QueryConstructor().constructor(statement);
+		operator.dump();
 
 	}
 
