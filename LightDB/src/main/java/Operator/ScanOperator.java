@@ -13,9 +13,6 @@ public class ScanOperator extends Operator{
 
     //TODO 创建一个能够读取csv文件的对象引用
 
-//    List<List<Integer>> data = new ArrayList<>();
-//    public int index = 0;
-
     List<String> columns;
 
     String tableName;
@@ -36,7 +33,7 @@ public class ScanOperator extends Operator{
         }else{
             tableName = fromItem.toString().split(" ")[0];
         }
-        dbFile = catalog.getDbPath() + tableName +".csv";;
+        dbFile = catalog.getDbPath() + "/data/" + tableName +".csv";;
 
 
         //TODO 将dbPath和表名拼接，获取数据文件的路径
@@ -50,7 +47,7 @@ public class ScanOperator extends Operator{
         }
 
         //TODO 初始化Tuple的表名和列
-        String schema = catalog.getSchemaPath();
+        String schema = catalog.getDbPath() + "/" + catalog.getSchemaFile();
         FileReader frSchema = null;
         BufferedReader brSchema = null;
         try {

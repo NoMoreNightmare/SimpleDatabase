@@ -16,7 +16,7 @@ public abstract class Operator {
     public void dump() {
         String printChoice = PropertyInTest.properties.getProperty("printStream");
         if ("file".equals(printChoice)){
-            String outputPath = Catalog.getInstance().getOutputPath() + "test.csv";
+            String outputPath = Catalog.getInstance().getOutputPath();
             File file = new File(outputPath);
             if(!file.exists()){
                 try {
@@ -56,24 +56,7 @@ public abstract class Operator {
                 }
             }
         }else if("console".equals(printChoice)){
-            PrintStream printStream = null;
-
-            try {
-                printStream = new PrintStream(System.out);
-                while(true){
-                    Tuple tuple = this.getNextTuple();
-                    if(tuple == null){
-                        break;
-                    }
-                    for(Integer value : tuple.getValues()) {
-                        printStream.print(value);
-                        printStream.print(" ");
-                    }
-                    printStream.print("\n");
-                }
-            } catch(Exception e){
-                e.printStackTrace();
-            }
+            printToConsole();
 //            finally {     //printStream一旦关闭就在这个程序中再也无法启用，因此不关闭
 //                if(printStream != null){
 //                    printStream.close();
@@ -82,6 +65,28 @@ public abstract class Operator {
 
         }else{
             //TODO 默认输出到控制台
+            printToConsole();
+        }
+    }
+
+    private void printToConsole() {
+        PrintStream printStream = null;
+
+        try {
+            printStream = new PrintStream(System.out);
+            while(true){
+                Tuple tuple = this.getNextTuple();
+                if(tuple == null){
+                    break;
+                }
+                for(Integer value : tuple.getValues()) {
+                    printStream.print(value);
+                    printStream.print(" ");
+                }
+                printStream.print("\n");
+            }
+        } catch(Exception e){
+            e.printStackTrace();
         }
     }
 }

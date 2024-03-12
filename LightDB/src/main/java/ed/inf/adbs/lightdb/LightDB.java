@@ -1,18 +1,17 @@
 package ed.inf.adbs.lightdb;
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Properties;
 
-import net.sf.jsqlparser.expression.Expression;
+import Interpreter.QueryConstructor;
+import Operator.Operator;
+import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import pojo.Catalog;
-
-import javax.sound.sampled.Port;
+import pojo.PropertyInTest;
 
 /**
  * Lightweight in-memory database system
@@ -28,15 +27,22 @@ public class LightDB {
 		}
 
 		String databaseDir = args[0];
-		String inputFile = args[1];
+		String sqlFile = args[1];
 		String outputFile = args[2];
 
+
 		Catalog catalog = Catalog.getInstance();
+		catalog.setSqlPath(sqlFile);
 		catalog.setDbPath(databaseDir);
 		catalog.setOutputPath(outputFile);
+		catalog.setSchemaFile("schema.txt");
 
 		// Just for demonstration, replace this function call with your logic
-		parsingExample(inputFile);
+		try {
+			parsingExample();
+		} catch (JSQLParserException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -45,29 +51,20 @@ public class LightDB {
 	 * prints it to screen.
 	 */
 
-	public static void parsingExample(String filename) {
-		try {
-			Statement statement = CCJSqlParserUtil.parse(new FileReader(filename));
-//            Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Boats");
-			if (statement != null) {
-				Select select = (Select) statement;
-				PlainSelect plainSelect = select.getPlainSelect();
-
-			}
-
-		} catch (Exception e) {
-			System.err.println("Exception occurred during parsing");
-			e.printStackTrace();
-		}
+	public static void parsingExample() throws FileNotFoundException, JSQLParserException {
+		QueryConstructor queryConstructor = new QueryConstructor();
+		Statement statement = CCJSqlParserUtil.parse(new FileReader(Catalog.getInstance().getSqlPath()));
+		Operator operator = queryConstructor.constructor(statement);
+		operator.dump();
 	}
 
-	public static Properties loadProperties() throws IOException {
-		InputStream inputStream = LightDB.class.getClassLoader().getResourceAsStream("properties.properties");
-		Properties properties = new Properties();
-		properties.load(inputStream);
-
-		return properties;
-	}
+//	public static Properties loadProperties() throws IOException {
+//		InputStream inputStream = LightDB.class.getClassLoader().getResourceAsStream("properties.properties");
+//		Properties properties = new Properties();
+//		properties.load(inputStream);
+//
+//		return properties;
+//	}
 
 
 

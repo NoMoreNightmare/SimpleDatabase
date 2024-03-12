@@ -83,7 +83,6 @@ public class JoinExpressionDeParser extends ExpressionDeParser {
                     thisExpressionSingle = andExpression;
                 }
             }
-
         }else{
             expression.accept(this);
         }
@@ -196,6 +195,7 @@ public class JoinExpressionDeParser extends ExpressionDeParser {
     public void visit(MinorThan expression){
         Expression left = expression.getLeftExpression();
         Expression right = expression.getRightExpression();
+
 
         concatExpression(expression, left, right);
     }

@@ -10,7 +10,9 @@ public class Catalog {
     private static final Catalog CATALOG = new Catalog();
     private String dbPath;
     private String outputPath;
-    private String schemaPath;
+    private String schemaFile;
+
+    private String sqlPath;
 
     private Catalog(){
         InputStream inputStream = LightDB.class.getClassLoader().getResourceAsStream("properties.properties");
@@ -18,13 +20,11 @@ public class Catalog {
         try {
             properties.load(inputStream);
             dbPath = properties.getProperty("db.data.relative-path");
-            schemaPath = properties.getProperty("db.schema");
+            schemaFile = properties.getProperty("db.schema");
             outputPath = properties.getProperty("output-path");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
     public static Catalog getInstance(){
@@ -40,8 +40,8 @@ public class Catalog {
         return outputPath;
     }
 
-    public String getSchemaPath() {
-        return schemaPath;
+    public String getSchemaFile() {
+        return schemaFile;
     }
 
     public void setDbPath(String dbPath) {
@@ -52,7 +52,15 @@ public class Catalog {
         this.outputPath = outputPath;
     }
 
-    public void setSchemaPath(String schemaPath) {
-        this.schemaPath = schemaPath;
+    public void setSchemaFile(String schemaPath) {
+        this.schemaFile = schemaPath;
+    }
+
+    public String getSqlPath() {
+        return sqlPath;
+    }
+
+    public void setSqlPath(String sqlPath) {
+        this.sqlPath = sqlPath;
     }
 }

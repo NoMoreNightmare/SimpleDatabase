@@ -3,11 +3,13 @@ package ed.inf.adbs.lightdb;
 import Interpreter.QueryConstructor;
 import Interpreter.TopInterpreter;
 import Operator.*;
+import com.sun.jdi.BooleanValue;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.IsBooleanExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
@@ -40,7 +42,7 @@ public class LightDBTest {
 
 	@Test
 	public void test() throws IOException, JSQLParserException {
-		Properties properties = LightDB.loadProperties();
+//		Properties properties = LightDB.loadProperties();
 		String filename = "samples/input/mytest.sql";
 		Statement statement = CCJSqlParserUtil.parse(new FileReader(filename));
 //            Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Boats");
@@ -322,14 +324,12 @@ public class LightDBTest {
 	}
 
 	@Test
-	public void buffer() throws IOException {
-		FileWriter fw = new FileWriter("azhe.csv");
-		fw.write("wqq,");
-		fw.write("wqq\n");
-		fw.write("1,");
-		fw.write("2\n");
-		fw.flush();
-		fw.close();
+	public void buffer() throws IOException, JSQLParserException {
+		Statement statement = CCJSqlParserUtil.parse("select * from Sailors S where true");
+		PlainSelect plainSelect = ((Select) statement).getPlainSelect();
+		Expression where = plainSelect.getWhere();
+		Operator operator = new QueryConstructor().constructor(statement);
+
 	}
 
 	@Test

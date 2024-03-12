@@ -51,6 +51,11 @@ public class SelectExpressionDeParser extends ExpressionDeParser {
             Column column = (Column) expression;
             String columnName = column.getFullyQualifiedName().toUpperCase();
             Integer value = tuple.getValue(columnName);
+            if("True".equalsIgnoreCase(columnName)){
+                return;
+            }else if("False".equalsIgnoreCase(columnName)){
+                result = false;
+            }
             if(value == null){
                 throw new RuntimeException("The column doesn't exist");
             }
