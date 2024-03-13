@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * the group operator for sum
+ */
 public class SumOperator extends Operator{
     Operator operator;
     Map<Tuple, Integer> sum = new HashMap<>();
@@ -28,6 +31,12 @@ public class SumOperator extends Operator{
 
     int index = 0;
 
+    /**
+     * construct a group operator for sum
+     * @param group the columns used for group
+     * @param selectItems the projected columns and use it to check whether the sum column exists
+     * @param operator the child operator
+     */
     public SumOperator(GroupByElement group, List<SelectItem<?>> selectItems, Operator operator){
         this.operator = operator;
         this.group = group;
@@ -35,11 +44,12 @@ public class SumOperator extends Operator{
         getAllGroups();
     }
 
+    /**
+     * get all the tuples and group them using sum and hashmap
+     */
     private void getAllGroups() {
         if(group == null){
             int sum = 0;
-//            Function function = (Function) sumItem.getExpression();
-//            Object parameters = function.getParameters().get(0);
 
             Tuple tuple = operator.getNextTuple();
             while(tuple != null){
@@ -48,48 +58,6 @@ public class SumOperator extends Operator{
                 tuple = operator.getNextTuple();
             }
             putIntoMap(sum);
-//            if(parameters instanceof Column){
-//                Column column = (Column) parameters;
-//                String columnName = column.getFullyQualifiedName().toUpperCase();
-//                Tuple tuple = operator.getNextTuple();
-//                while(tuple != null){
-//                    sum += tuple.getValue(columnName);
-//                    tuple = operator.getNextTuple();
-//                }
-//                putIntoMap(sum);
-//            }else if(parameters instanceof Multiplication){
-//                Multiplication multiplication = (Multiplication) parameters;
-//                MultiplicationDeParser multiplicationDeParser = new MultiplicationDeParser();
-//                multiplication.accept(multiplicationDeParser);
-//                List<Expression> expressions = multiplicationDeParser.getExpressions();
-//
-//                Tuple tuple = operator.getNextTuple();
-//                while(tuple != null){
-//                    int currentSum = 1;
-//                    for(Expression expression : expressions){
-//                        Column column = (Column) expression;
-//                        String columnName = column.getFullyQualifiedName().toUpperCase();
-//                        currentSum *= tuple.getValue(columnName);
-//                    }
-//                    sum += currentSum;
-//
-//                    tuple = operator.getNextTuple();
-//                }
-//
-//                putIntoMap(sum);
-//
-//            }else{
-//                LongValue longValue = (LongValue) parameters;
-//                long value = longValue.getValue();
-//                Tuple tuple = operator.getNextTuple();
-//                while(tuple != null){
-//                    sum += value;
-//                    tuple = operator.getNextTuple();
-//                }
-//
-//                putIntoMap(sum);
-//            }
-
             createFinalTuple();
 
         }else{
@@ -131,6 +99,9 @@ public class SumOperator extends Operator{
 
     }
 
+    /**
+     * create the result tuples list from the grouped tuples
+     */
     private void createFinalTuple() {
         if(!(sumItem.getExpression() instanceof Function)){
             results.addAll(this.sum.keySet());
@@ -148,6 +119,10 @@ public class SumOperator extends Operator{
         }
     }
 
+    /**
+     * create new tuple and put it in the hashmap
+     * @param sum
+     */
     private void putIntoMap(int sum) {
         Tuple tuple;
         tuple = new Tuple();
@@ -158,6 +133,11 @@ public class SumOperator extends Operator{
         this.sum.put(tuple, sum);
     }
 
+    /**
+     * calculate the result inside the sum column for specified tuple
+     * @param tuple the tuple to calculate the parameters in the sum operator
+     * @return the result in the sum
+     */
     private int calculateValue(Tuple tuple) {
         int mul = 1;
         Function function = (Function) sumItem.getExpression();
@@ -185,6 +165,10 @@ public class SumOperator extends Operator{
         }
     }
 
+    /**
+     * get the next grouped result
+     * @return the grouped tuple
+     */
     @Override
     public Tuple getNextTuple() {
         if(index == results.size()){
@@ -195,6 +179,9 @@ public class SumOperator extends Operator{
         return tuple;
     }
 
+    /**
+     * reset the operator
+     */
     @Override
     public void reset() {
         operator.reset();

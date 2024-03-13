@@ -19,12 +19,22 @@ import javax.print.DocFlavor;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * responsible for creating optimized query plan from a Statement and return the root operator
+ */
 public class QueryConstructor {
+    /**
+     * construct a query plan from a statement
+     * @param statement the sql statement
+     * @return the root operator of the entire query plan
+     */
     public Operator constructor(Statement statement){
         if (statement != null) {
             Select select = (Select) statement;
 
             PlainSelect plainSelect = select.getPlainSelect();
+
+            //try to get all the components from the statement
             FromItem fromItem = plainSelect.getFromItem();
 
             Expression expression = plainSelect.getWhere();
@@ -282,6 +292,15 @@ public class QueryConstructor {
 //        return new JoinOperator(expressionJoin, left, right);
 //
 //    }
+
+    /**
+     * recursively construct the binary join operator from the component
+     * @param fromItem the left table
+     * @param expression the join condition expression
+     * @param joins the table need to join
+     * @param materialized whether apply the materialization to optimize the query plan
+     * @return the constructed join operator
+     */
     private Operator recursiveConstructJoin(FromItem fromItem, Expression expression, List<Join> joins, boolean materialized) {
         JoinExpressionDeParser joinExpressionDeParser = new JoinExpressionDeParser();
         String tableName;
@@ -324,7 +343,15 @@ public class QueryConstructor {
 
     }
 
-
+    /**
+     * recursively construct the binary join operator from the component and apply projection pushdown and selection pushdown
+     * @param fromItem the left table
+     * @param expression the join condition
+     * @param joins the tables need to join
+     * @param projections the required columns
+     * @param materialized whether apply the materialization
+     * @return the constructed join operator
+     */
     private Operator recursiveConstructJoin(FromItem fromItem, Expression expression, List<Join> joins, Map<String, Column> projections, boolean materialized) {
         JoinExpressionDeParser joinExpressionDeParser = new JoinExpressionDeParser();
         String rightTableName;
@@ -398,6 +425,13 @@ public class QueryConstructor {
     }
 
 
+    /**
+     * construct the child operator of the join operator without projection
+     * @param fromItem one of the table
+     * @param expression the expression that can be applied to the table
+     * @param materialized whether to materialize the selection result
+     * @return the constructed operator
+     */
     private Operator constructScanSelect(FromItem fromItem, Expression expression, boolean materialized){
         Operator first;
         Operator scan = new ScanOperator(fromItem);
@@ -422,6 +456,14 @@ public class QueryConstructor {
         return first;
     }
 
+    /**
+     * construct the child operator of the join operator with projection
+     * @param fromItem one of the table
+     * @param expression the expression that can be applied to the table
+     * @param selectItems the columns need to project
+     * @param materialized whether to materialize the selection result
+     * @return the constructed operator
+     */
     private Operator constructScanSelectProject(FromItem fromItem, Expression expression, List<SelectItem<?>> selectItems, boolean materialized){
         Operator first;
         Operator scan = new ScanOperator(fromItem);

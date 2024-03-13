@@ -10,17 +10,28 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * the selection operator
+ */
 public class SelectOperator extends Operator{
 
     Operator operator;
     Expression expression;
 
-
-
+    /**
+     * construct the selection operator
+     * @param expression the expression for filtering the tuples
+     * @param operator the child operator
+     */
     public SelectOperator(Expression expression, Operator operator){
         this.operator = operator;
         this.expression = expression;
     }
+
+    /**
+     * get the next tuple that fit the selection expression
+     * @return the next tuple
+     */
     @Override
     public Tuple getNextTuple() {
         Tuple tuple = operator.getNextTuple();
@@ -45,6 +56,9 @@ public class SelectOperator extends Operator{
 
     }
 
+    /**
+     * reset the operator
+     */
     @Override
     public void reset() {
         operator.reset();

@@ -2,6 +2,9 @@ package pojo;
 
 import java.util.*;
 
+/**
+ * the class stored tuple information
+ */
 public class Tuple {
 
 
@@ -24,7 +27,7 @@ public class Tuple {
     }
 
     /**
-     * 用来打印tuple的东西，上传时删除
+     * print tuple
      */
     public void printTuple(){
         for(Integer i : values){
@@ -33,6 +36,11 @@ public class Tuple {
         System.out.println();
     }
 
+    /**
+     * get the value of that column in the tuple
+     * @param column the specified column
+     * @return the value
+     */
     public Integer getValue(String column){
         column = column.toUpperCase();
         if(columns.contains(column)){
@@ -43,18 +51,35 @@ public class Tuple {
         }
     }
 
+    /**
+     * set the columns in the tuple
+     * @param columns columns
+     */
     public void setColumns(List<String> columns) {
         this.columns = columns;
     }
 
+    /**
+     * get the table name that tuple belongs to
+     * @return the table name
+     */
     public String getTableName() {
         return tableName;
     }
 
+    /**
+     * set the table name that tuple belongs to
+     * @param tableName  the table name
+     */
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
 
+    /**
+     * the rules to judge whether two tuples are equal
+     * @param o the tuple to compare
+     * @return whether two tuples are equal
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -73,6 +98,10 @@ public class Tuple {
         return true;
     }
 
+    /**
+     * rewrited hashcode
+     * @return
+     */
     @Override
     public int hashCode() {
         return Objects.hash(values);

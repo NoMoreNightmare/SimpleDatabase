@@ -6,6 +6,9 @@ import ed.inf.adbs.lightdb.LightDB;
 
 import java.io.*;
 
+/**
+ * the abstract parent of all the operator
+ */
 public abstract class Operator {
     public abstract Tuple getNextTuple();
 
@@ -13,6 +16,9 @@ public abstract class Operator {
 
     //TODO 把tuple写到适合的printStream，比如文件或者输出控制台
 
+    /**
+     * print the result to the console or store the result in the file
+     */
     public void dump() {
         String printChoice = PropertyInTest.properties.getProperty("printStream");
         if ("file".equals(printChoice)){
@@ -69,6 +75,9 @@ public abstract class Operator {
         }
     }
 
+    /**
+     * print to console
+     */
     private void printToConsole() {
         PrintStream printStream = null;
 

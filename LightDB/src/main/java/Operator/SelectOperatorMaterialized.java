@@ -9,6 +9,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * the selection operator with materialization
+ */
 public class SelectOperatorMaterialized extends SelectOperator{
 
     String tableName = null;
@@ -19,6 +22,12 @@ public class SelectOperatorMaterialized extends SelectOperator{
     BufferedReader br = null;
 
     boolean empty = false;
+
+    /**
+     * construct the selection operator with materialization approach
+     * @param expression the expression for filtering the tuples
+     * @param operator the child operator
+     */
     public SelectOperatorMaterialized(Expression expression, Operator operator) {
         super(expression, operator);
         try {
@@ -28,6 +37,10 @@ public class SelectOperatorMaterialized extends SelectOperator{
         }
     }
 
+    /**
+     * get the next tuple that fit the expression
+     * @return the next tuple
+     */
     @Override
     public Tuple getNextTuple() {
         if(empty){
@@ -59,6 +72,9 @@ public class SelectOperatorMaterialized extends SelectOperator{
 
     }
 
+    /**
+     * reset the operator
+     */
     @Override
     public void reset() {
         super.reset();
@@ -70,6 +86,10 @@ public class SelectOperatorMaterialized extends SelectOperator{
         }
     }
 
+    /**
+     * materialize the selection result in the file
+     * @throws IOException IOException
+     */
     public void materialize() throws IOException {
         String dir = PropertyInTest.properties.getProperty("temp-path");
         File file = new File(dir);

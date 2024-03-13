@@ -4,11 +4,19 @@ import pojo.Tuple;
 
 import java.util.*;
 
+/**
+ * the operator to eliminate the duplicate records
+ */
 public class DuplicateEliminationOperator extends Operator{
     Operator operator;
     List<Tuple> lists = new ArrayList<>();
     int index = 0;
 
+    /**
+     * construct the operator according to whether the tuples has been sorted
+     * @param operator the child operator
+     * @param ordered whether the tuples has been sorted
+     */
     public DuplicateEliminationOperator(Operator operator, boolean ordered){
         this.operator = operator;
         if(!ordered){
@@ -18,6 +26,9 @@ public class DuplicateEliminationOperator extends Operator{
         }
     }
 
+    /**
+     * use list to eliminate the duplicate
+     */
     private void getAllTuplesWithList() {
         Tuple tuple = operator.getNextTuple();
         int currentIndex = 0;
@@ -38,6 +49,9 @@ public class DuplicateEliminationOperator extends Operator{
         }
     }
 
+    /**
+     * use hashset to eliminate the duplicate
+     */
     private void getAllTuplesWithSet() {
         Set<Tuple> tuples = new HashSet<>();
 
@@ -51,6 +65,10 @@ public class DuplicateEliminationOperator extends Operator{
         lists = new ArrayList<>(tuples);
     }
 
+    /**
+     * get the next tuple
+     * @return the current tuple or null
+     */
     @Override
     public Tuple getNextTuple() {
         if(index == lists.size()){
@@ -62,6 +80,9 @@ public class DuplicateEliminationOperator extends Operator{
         }
     }
 
+    /**
+     * reset the operator
+     */
     @Override
     public void reset() {
         operator.reset();

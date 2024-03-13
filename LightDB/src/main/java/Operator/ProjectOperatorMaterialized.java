@@ -9,6 +9,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * the project operator with materialization
+ */
 public class ProjectOperatorMaterialized extends ProjectOperator{
     String tableName = null;
     List<String> columnNames = null;
@@ -18,6 +21,12 @@ public class ProjectOperatorMaterialized extends ProjectOperator{
     BufferedReader br = null;
 
     boolean empty = false;
+
+    /**
+     * construct a projection operator and apply materialization
+     * @param selectItem the projected columns
+     * @param operator the child operator
+     */
     public ProjectOperatorMaterialized(List<SelectItem<?>> selectItem, Operator operator) {
         super(selectItem, operator);
         try {
@@ -27,6 +36,10 @@ public class ProjectOperatorMaterialized extends ProjectOperator{
         }
     }
 
+    /**
+     * get the next tuple if one of the columns of that table will be used, otherwise return null
+     * @return the tuple
+     */
     @Override
     public Tuple getNextTuple() {
         if(empty){
@@ -58,6 +71,9 @@ public class ProjectOperatorMaterialized extends ProjectOperator{
 
     }
 
+    /**
+     * reset the operator
+     */
     @Override
     public void reset() {
         super.reset();
@@ -69,6 +85,11 @@ public class ProjectOperatorMaterialized extends ProjectOperator{
         }
     }
 
+    /**
+     * get all the tuples and store them in specified file to materialization
+     * store the table name and columns of that tuple
+     * @throws IOException IOException
+     */
     public void materialize() throws IOException {
         String dir = PropertyInTest.properties.getProperty("temp-path");
         File file = new File(dir);

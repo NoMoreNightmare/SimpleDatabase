@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import Interpreter.QueryConstructor;
+import Interpreter.TopInterpreter;
 import Operator.Operator;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -52,19 +53,9 @@ public class LightDB {
 	 */
 
 	public static void parsingExample() throws FileNotFoundException, JSQLParserException {
-		QueryConstructor queryConstructor = new QueryConstructor();
-		Statement statement = CCJSqlParserUtil.parse(new FileReader(Catalog.getInstance().getSqlPath()));
-		Operator operator = queryConstructor.constructor(statement);
-		operator.dump();
+		TopInterpreter topInterpreter = new TopInterpreter(Catalog.getInstance().getSqlPath(), "data");
+		topInterpreter.dump();
 	}
-
-//	public static Properties loadProperties() throws IOException {
-//		InputStream inputStream = LightDB.class.getClassLoader().getResourceAsStream("properties.properties");
-//		Properties properties = new Properties();
-//		properties.load(inputStream);
-//
-//		return properties;
-//	}
 
 
 

@@ -9,6 +9,9 @@ import pojo.Tuple;
 
 import java.util.*;
 
+/**
+ * the order operator
+ */
 public class SortOperator extends Operator{
 
     Operator operator;
@@ -19,40 +22,20 @@ public class SortOperator extends Operator{
 
     int index = 0;
 
-//    public SortOperator(FromItem fromItem, Expression expression, List<SelectItem<?>> selectItems, List<Join> joins, List<OrderByElement> orders){
-//        if(joins == null){
-//            operator = new ProjectOperator(fromItem, expression, selectItems);
-//        }else{
-//            operator = new ProjectOperator(fromItem, expression, selectItems, joins);
-//        }
-//        this.orders = orders;
-//        getAllTuples();
-//    }
-//
-//    public SortOperator(FromItem fromItem, Expression expression, List<Join> joins, List<OrderByElement> orders){
-//        operator = new JoinOperator(fromItem, expression, joins);
-//        this.orders = orders;
-//        getAllTuples();
-//    }
-//
-//    public SortOperator(FromItem fromItem, Expression expression, List<OrderByElement> orders){
-//        operator = new SelectOperator(fromItem, expression);
-//        this.orders = orders;
-//        getAllTuples();
-//    }
-//
-//    public SortOperator(FromItem fromItem, List<OrderByElement> orders){
-//        operator = new ScanOperator(fromItem);
-//        this.orders = orders;
-//        getAllTuples();
-//    }
-
+    /**
+     * construct the sort operator according to the specified column
+     * @param orders the columns used for sorting
+     * @param operator child operator
+     */
     public SortOperator(List<OrderByElement> orders, Operator operator){
         this.orders = orders;
         this.operator = operator;
         getAllTuples();
     }
 
+    /**
+     * store all the result tuples from the child operator and prepare for the sorting
+     */
     private void getAllTuples(){
         Tuple tuple = operator.getNextTuple();
         while(tuple != null){
@@ -63,6 +46,10 @@ public class SortOperator extends Operator{
         tuples.sort(new MyComparator());
     }
 
+    /**
+     * get the next tuple according to the sorted tuples
+     * @return
+     */
     @Override
     public Tuple getNextTuple() {
         if(index == tuples.size()){
@@ -75,12 +62,19 @@ public class SortOperator extends Operator{
         return tuple;
     }
 
+    /**
+     * reset the operator
+     */
     @Override
     public void reset() {
+        operator.reset();
         index = 0;
     }
 
 
+    /**
+     * the compare rules of the Tuple class for the sorting
+     */
     class MyComparator implements Comparator<Tuple>{
 
         @Override

@@ -11,9 +11,9 @@ public class Catalog {
     private String dbPath;
     private String outputPath;
     private String schemaFile;
-
     private String sqlPath;
 
+    private String database;
     private Catalog(){
         InputStream inputStream = LightDB.class.getClassLoader().getResourceAsStream("properties.properties");
         Properties properties = new Properties();
@@ -62,5 +62,13 @@ public class Catalog {
 
     public void setSqlPath(String sqlPath) {
         this.sqlPath = sqlPath;
+    }
+
+    public String getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(String database) {
+        this.database = database;
     }
 }

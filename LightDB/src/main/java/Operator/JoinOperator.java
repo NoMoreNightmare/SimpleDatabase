@@ -10,6 +10,9 @@ import pojo.Tuple;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * the join operator
+ */
 public class JoinOperator extends Operator{
 
     Operator left;
@@ -68,12 +71,23 @@ public class JoinOperator extends Operator{
 //        }
 //        //JoinExpressionDeParser每次只把右边的table的相关的expression筛选出来并留下，其他的expression传到left operator里
 //    }
+
+    /**
+     * construct a join operator
+     * @param expression the join condition expression
+     * @param left the left child
+     * @param right the right child
+     */
     public JoinOperator(Expression expression, Operator left, Operator right){
         this.left = left;
         this.right = right;
         this.expressionJoin = expression;
     }
 
+    /**
+     * get the next tuple
+     * @return next tuple
+     */
     @Override
     public Tuple getNextTuple() {
         //如果当前leftTuple是null，返回null
@@ -122,6 +136,9 @@ public class JoinOperator extends Operator{
 
     }
 
+    /**
+     * reset the operator
+     */
     @Override
     public void reset() {
         left.reset();

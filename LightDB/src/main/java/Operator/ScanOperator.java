@@ -9,9 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * scan the entire file
+ */
 public class ScanOperator extends Operator{
-
-    //TODO 创建一个能够读取csv文件的对象引用
 
     List<String> columns;
 
@@ -22,7 +23,13 @@ public class ScanOperator extends Operator{
     String dbFile = null;
 
 
-    //TODO 应该在构造的时候知道要解析的sql文件路径，数据文件的路径和最终输出的路径
+    //
+
+    /**
+     * construct the scan operator for the target table
+     * get schema and data files path from parsed result
+     * @param fromItem the target table
+     */
     public ScanOperator(FromItem fromItem){
         //TODO 获取Catalog来获取各个目录
         String tableName;
@@ -33,7 +40,7 @@ public class ScanOperator extends Operator{
         }else{
             tableName = fromItem.toString().split(" ")[0];
         }
-        dbFile = catalog.getDbPath() + "/data/" + tableName +".csv";;
+        dbFile = catalog.getDbPath() + "/" + catalog.getDatabase() + "/" + tableName +".csv";;
 
 
         //TODO 将dbPath和表名拼接，获取数据文件的路径
@@ -93,7 +100,10 @@ public class ScanOperator extends Operator{
 
     }
 
-    //TODO 获取这个operator会输出的下一个tuple
+    /**
+     * get the next tuple stored in the data file
+     * @return the next tuple
+     */
     @Override
     public Tuple getNextTuple() {
         try {
@@ -119,7 +129,7 @@ public class ScanOperator extends Operator{
         }
     }
 
-    //TODO 从头开始，从这个operator会返回的第一个tuple重新开始
+    //restart from reading the file
     @Override
     public void reset() {
         try {

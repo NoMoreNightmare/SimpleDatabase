@@ -17,12 +17,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * the projection operator
+ */
 public class ProjectOperator extends Operator{
     Operator operator;
     List<SelectItem<?>> selectItem;
 
     boolean materialized = false;
 
+    /**
+     * construct a projection operator
+     * @param selectItem the projected columns
+     * @param operator the child operator
+     */
     public ProjectOperator(List<SelectItem<?>> selectItem, Operator operator){
         this.operator = operator;
         this.selectItem = selectItem;
@@ -33,6 +41,11 @@ public class ProjectOperator extends Operator{
 //        this.selectItem = selectItem;
 //    }
 
+    /**
+     * get the next tuple
+     * if the selected item is '*', return all the columns, else return the projected columns
+     * @return next tuple
+     */
     @Override
     public Tuple getNextTuple() {
         Tuple tuple = operator.getNextTuple();
@@ -89,6 +102,9 @@ public class ProjectOperator extends Operator{
 
     }
 
+    /**
+     * reset the operator
+     */
     @Override
     public void reset() {
         operator.reset();
