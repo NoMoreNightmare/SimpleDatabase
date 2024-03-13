@@ -1,8 +1,7 @@
 package Operator;
-import pojo.Catalog;
-import pojo.PropertyInTest;
-import pojo.Tuple;
-import ed.inf.adbs.lightdb.LightDB;
+import tools.Catalog;
+import tools.PropertyLoading;
+import tools.Tuple;
 
 import java.io.*;
 
@@ -20,7 +19,7 @@ public abstract class Operator {
      * print the result to the console or store the result in the file
      */
     public void dump() {
-        String printChoice = PropertyInTest.properties.getProperty("printStream");
+        String printChoice = PropertyLoading.properties.getProperty("printStream");
         if ("file".equals(printChoice)){
             String outputPath = Catalog.getInstance().getOutputPath();
             File file = new File(outputPath);
@@ -63,14 +62,9 @@ public abstract class Operator {
             }
         }else if("console".equals(printChoice)){
             printToConsole();
-//            finally {     //printStream一旦关闭就在这个程序中再也无法启用，因此不关闭
-//                if(printStream != null){
-//                    printStream.close();
-//                }
-//            }
 
         }else{
-            //TODO 默认输出到控制台
+            //print to console
             printToConsole();
         }
     }

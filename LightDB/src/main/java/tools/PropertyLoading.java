@@ -1,4 +1,4 @@
-package pojo;
+package tools;
 
 import ed.inf.adbs.lightdb.LightDB;
 
@@ -9,7 +9,7 @@ import java.util.Properties;
 /**
  * load the settings in the property file
  */
-public class PropertyInTest {
+public class PropertyLoading {
     public static Properties properties;
     public static String sqlPath;
 

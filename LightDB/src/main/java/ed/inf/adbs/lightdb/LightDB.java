@@ -1,18 +1,11 @@
 package ed.inf.adbs.lightdb;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 
-import Interpreter.QueryConstructor;
 import Interpreter.TopInterpreter;
-import Operator.Operator;
 import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.*;
-import pojo.Catalog;
-import pojo.PropertyInTest;
+import tools.Catalog;
 
 /**
  * Lightweight in-memory database system

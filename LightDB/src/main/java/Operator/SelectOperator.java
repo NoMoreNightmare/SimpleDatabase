@@ -1,17 +1,11 @@
 package Operator;
 
-import net.sf.jsqlparser.statement.select.FromItem;
-import pojo.Parser.SelectExpressionDeParser;
-import pojo.PropertyInTest;
-import pojo.Tuple;
+import tools.Parser.SelectExpressionDeParser;
+import tools.Tuple;
 import net.sf.jsqlparser.expression.Expression;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
 /**
- * the selection operator
+ * the selection operator that filter out the tuples that fit the condition
  */
 public class SelectOperator extends Operator{
 

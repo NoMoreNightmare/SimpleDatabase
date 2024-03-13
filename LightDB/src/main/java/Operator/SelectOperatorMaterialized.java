@@ -1,8 +1,8 @@
 package Operator;
 
 import net.sf.jsqlparser.expression.Expression;
-import pojo.PropertyInTest;
-import pojo.Tuple;
+import tools.PropertyLoading;
+import tools.Tuple;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * the selection operator with materialization
+ * the selection operator with materialization and filter out the tuples that fit the condition
  */
 public class SelectOperatorMaterialized extends SelectOperator{
 
@@ -91,7 +91,7 @@ public class SelectOperatorMaterialized extends SelectOperator{
      * @throws IOException IOException
      */
     public void materialize() throws IOException {
-        String dir = PropertyInTest.properties.getProperty("temp-path");
+        String dir = PropertyLoading.properties.getProperty("temp-path");
         File file = new File(dir);
         if(!file.exists()){
             file.mkdirs();

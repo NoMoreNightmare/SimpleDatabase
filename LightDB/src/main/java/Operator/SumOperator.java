@@ -7,10 +7,9 @@ import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.GroupByElement;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectItem;
-import pojo.Parser.MultiplicationDeParser;
-import pojo.Tuple;
+import tools.Parser.MultiplicationDeParser;
+import tools.Tuple;
 
 import java.util.ArrayList;
 import java.util.HashMap;

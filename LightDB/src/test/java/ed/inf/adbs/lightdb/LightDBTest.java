@@ -3,25 +3,20 @@ package ed.inf.adbs.lightdb;
 import Interpreter.QueryConstructor;
 import Interpreter.TopInterpreter;
 import Operator.*;
-import com.sun.jdi.BooleanValue;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
-import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.IsBooleanExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import org.junit.Test;
-import pojo.Catalog;
-import pojo.Parser.JoinExpressionDeParser;
-import pojo.PropertyInTest;
-import pojo.Tuple;
+import tools.Catalog;
+import tools.Parser.JoinExpressionDeParser;
+import tools.PropertyLoading;
+import tools.Tuple;
 
-import javax.security.auth.Refreshable;
 import java.io.*;
 import java.util.*;
 
@@ -96,7 +91,7 @@ public class LightDBTest {
 
 	@Test
 	public void ScanOperatorSimpleTest() throws FileNotFoundException, JSQLParserException {
-		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
+		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyLoading.properties.getProperty("input-path")));
 //            Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Boats");
 
 		FromItem tableName = null;
@@ -116,7 +111,7 @@ public class LightDBTest {
 
 	@Test
 	public void SelectOperatorSimpleTest() throws FileNotFoundException, JSQLParserException {
-		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
+		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyLoading.properties.getProperty("input-path")));
 //            Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Boats");
 
 		FromItem tableName = null;
@@ -315,7 +310,7 @@ public class LightDBTest {
 
 	@Test
 	public void testProvidedSQL() throws FileNotFoundException, JSQLParserException {
-		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyInTest.properties.getProperty("input-path")));
+		Statement statement = CCJSqlParserUtil.parse(new FileReader(PropertyLoading.properties.getProperty("input-path")));
 
 		TopInterpreter topInterpreter = new TopInterpreter();
 		topInterpreter.setStatement(statement);

@@ -1,24 +1,14 @@
 package Operator;
 
-import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.AllColumns;
-import net.sf.jsqlparser.statement.select.FromItem;
-import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.SelectItem;
-import pojo.PropertyInTest;
-import pojo.Tuple;
+import tools.Tuple;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * the projection operator
+ * the projection operator that filter out the wanted columns
  */
 public class ProjectOperator extends Operator{
     Operator operator;

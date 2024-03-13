@@ -1,8 +1,8 @@
 package Operator;
 
 import net.sf.jsqlparser.statement.select.SelectItem;
-import pojo.PropertyInTest;
-import pojo.Tuple;
+import tools.PropertyLoading;
+import tools.Tuple;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * the project operator with materialization
+ * the project operator with materialization that filter out the wanted column
  */
 public class ProjectOperatorMaterialized extends ProjectOperator{
     String tableName = null;
@@ -91,7 +91,7 @@ public class ProjectOperatorMaterialized extends ProjectOperator{
      * @throws IOException IOException
      */
     public void materialize() throws IOException {
-        String dir = PropertyInTest.properties.getProperty("temp-path");
+        String dir = PropertyLoading.properties.getProperty("temp-path");
         File file = new File(dir);
         if(!file.exists()){
             file.mkdirs();

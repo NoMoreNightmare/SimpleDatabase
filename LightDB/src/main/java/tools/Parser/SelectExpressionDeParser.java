@@ -1,4 +1,4 @@
-package pojo.Parser;
+package tools.Parser;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -6,7 +6,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
-import pojo.Tuple;
+import tools.Tuple;
 
 /**
  * visit the expression and judge whether the tuple fit the condition

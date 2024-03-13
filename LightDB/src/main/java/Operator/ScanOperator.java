@@ -1,8 +1,8 @@
 package Operator;
 
 import net.sf.jsqlparser.statement.select.FromItem;
-import pojo.Catalog;
-import pojo.Tuple;
+import tools.Catalog;
+import tools.Tuple;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * scan the entire file
+ * scan the entire file and return tuples
  */
 public class ScanOperator extends Operator{
 

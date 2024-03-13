@@ -1,16 +1,12 @@
 package Operator;
 
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.statement.select.FromItem;
-import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.OrderByElement;
-import net.sf.jsqlparser.statement.select.SelectItem;
-import pojo.Tuple;
+import tools.Tuple;
 
 import java.util.*;
 
 /**
- * the order operator
+ * the order operator that sort the tuples according to the specified columns
  */
 public class SortOperator extends Operator{
 

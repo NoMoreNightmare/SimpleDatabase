@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import net.sf.jsqlparser.statement.Statement;
 import Operator.*;
-import pojo.Catalog;
+import tools.Catalog;
 
 /**
  * take the sql query file and database and process the query

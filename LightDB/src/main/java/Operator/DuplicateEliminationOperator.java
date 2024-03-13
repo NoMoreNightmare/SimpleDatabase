@@ -1,11 +1,11 @@
 package Operator;
 
-import pojo.Tuple;
+import tools.Tuple;
 
 import java.util.*;
 
 /**
- * the operator to eliminate the duplicate records
+ * the operator to eliminate the duplicate records using list or hashset
  */
 public class DuplicateEliminationOperator extends Operator{
     Operator operator;
