@@ -149,8 +149,10 @@ public class LightDBTest {
 			expression = plainSelect.getWhere();
 			selectItems = plainSelect.getSelectItems();
 		}
+		Catalog.getInstance().setDbPath("samples/db");
+		Catalog.getInstance().setDatabase("data");
+		Catalog.getInstance().setSchemaFile("schema.txt");
 
-		Catalog catalog = Catalog.getInstance();
 
 
 
@@ -166,6 +168,9 @@ public class LightDBTest {
 		Statement statement = CCJSqlParserUtil.parse("SELECT DISTINCT Sailors.A, Boats.E FROM Sailors, Reserves, Boats where Sailors.A = Reserves.G group by Sailors.A, Boats.E order by Boats.E,Sailors.A;");
 //		Statement statement = CCJSqlParserUtil.parse("SELECT E.E, B.E FROM Boats E, Boats B where E.E = B.E;");
 
+		Catalog.getInstance().setDbPath("samples/db");
+		Catalog.getInstance().setDatabase("data");
+		Catalog.getInstance().setSchemaFile("schema.txt");
 		TopInterpreter topInterpreter = new TopInterpreter();
 		topInterpreter.setStatement(statement);
 		topInterpreter.dump();
@@ -299,6 +304,9 @@ public class LightDBTest {
 //		TopInterpreter top = new TopInterpreter();
 //		top.setStatement(statement);
 //		top.dump();
+		Catalog.getInstance().setDbPath("samples/db");
+		Catalog.getInstance().setDatabase("data");
+		Catalog.getInstance().setSchemaFile("schema.txt");
 
 		Operator operator = new QueryConstructor().constructor(statement);
 		operator.dump();
@@ -330,6 +338,10 @@ public class LightDBTest {
 	@Test
 	public void additionalSum() throws JSQLParserException {
 		Statement statement = CCJSqlParserUtil.parse("select *,sum(S.A) from Sailors S group by S.A, S.B, S.C");
+
+		Catalog.getInstance().setDbPath("samples/db");
+		Catalog.getInstance().setDatabase("data");
+		Catalog.getInstance().setSchemaFile("schema.txt");
 		Operator operator = new QueryConstructor().constructor(statement);
 		operator.dump();
 
@@ -338,6 +350,10 @@ public class LightDBTest {
 	@Test
 	public void testLoop() throws JSQLParserException {
 		Statement statement = CCJSqlParserUtil.parse("select sum(S1.C*S2.B) from Sailors S1, Sailors S2, Sailors S3 where S1.A <= 4 and S2.B = 100 and S3.C >= 100 group by S1.C order by S1.C");
+		Catalog.getInstance().setDbPath("samples/db");
+		Catalog.getInstance().setDatabase("data");
+		Catalog.getInstance().setSchemaFile("schema.txt");
+
 		Operator operator = new QueryConstructor().constructor(statement);
 		operator.dump();
 	}

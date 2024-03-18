@@ -12,3 +12,11 @@ Second optimization approach applied is implementing two different methods for `
 Third optimization approach applied is `projection pushdown`. When executing `join` operator, the columns that will be used in the future operator like `projection`, `order`, `group by`, `WHERE` expression will be kept and pushed down to the `projection` operator for corresponding single table, other columns will be removed. 
 
 Fourth optimization approach applied is `materialization`. It is applied to the right table used in the `join` operator. After `selection` and `projection` operator for the single table is applied, store the result in disk (a temporary file) to avoid repeating recalculating `selection` and `projection` for that table. 
+
+### Configuration
+`properties.properties` is the configuration file both for testing and running programs. The `temp-path` property is used for providing path to store the result of materialization. `printStream` property is used for change the way of showing the result, if it is "console" then print to console, otherwise write into files. Other properties are all used for testing.
+
+`PropertyLoading` class are used to loading configuration information.
+
+`Catalog` class are used to store information of files and paths, it is implemented using Singleton Pattern, so that those information can be accessed by all the operators.
+

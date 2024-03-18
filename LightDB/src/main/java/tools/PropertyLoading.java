@@ -19,6 +19,16 @@ public class PropertyLoading {
         try {
             properties.load(inputStream);
             sqlPath = properties.getProperty("input-path");
+            String dbPath = properties.getProperty("db.data.relative-path");
+            String database = properties.getProperty("db.database");
+            String schema = properties.getProperty("db.schema");
+            String output = properties.getProperty("output-path");
+
+            Catalog.getInstance().setSqlPath(sqlPath);
+            Catalog.getInstance().setSchemaFile(schema);
+            Catalog.getInstance().setDbPath(dbPath);
+            Catalog.getInstance().setDatabase(database);
+            Catalog.getInstance().setOutputPath(output);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
