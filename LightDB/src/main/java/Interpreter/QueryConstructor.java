@@ -5,6 +5,7 @@ import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.Commit;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import tools.Parser.JoinExpressionDeParser;
@@ -22,6 +23,7 @@ public class QueryConstructor {
      * @return the root operator of the entire query plan
      */
     public Operator constructor(Statement statement){
+
         if (statement != null) {
             Select select = (Select) statement;
 

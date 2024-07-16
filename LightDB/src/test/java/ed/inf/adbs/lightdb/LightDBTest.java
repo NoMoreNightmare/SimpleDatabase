@@ -7,11 +7,15 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.Commit;
+import net.sf.jsqlparser.statement.RollbackStatement;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import org.junit.Test;
+import tools.Begin;
 import tools.Catalog;
 import tools.Parser.JoinExpressionDeParser;
 import tools.PropertyLoading;
@@ -356,6 +360,18 @@ public class LightDBTest {
 
 		Operator operator = new QueryConstructor().constructor(statement);
 		operator.dump();
+	}
+
+	@Test
+	public void testTransaction() throws JSQLParserException {
+		if("BEGIN".equalsIgnoreCase("begin")){
+			List<String> begin = new ArrayList<>();
+			begin.add("BEGIN");
+			System.out.println(new Begin(begin));
+		}
+
+		new CCJSqlParserManager().parse(new StringReader("begin;select * from tab_tb"));
+		CCJSqlParserUtil.parse("insert into tb_nnn values (v1,v2,v3)");
 	}
 
 
