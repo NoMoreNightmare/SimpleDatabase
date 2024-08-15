@@ -3,6 +3,7 @@ package Operator;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import tools.Tuple;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -18,6 +19,14 @@ public class SortOperator extends Operator{
 
     int index = 0;
 
+    final int DEFAULT_SIZE = 1024;
+
+    String tableName;
+    List<String> columns;
+
+    String tmpPrefix = "temp";
+
+    BufferedReader finalFile;
     /**
      * construct the sort operator according to the specified column
      * @param orders the columns used for sorting
@@ -34,12 +43,177 @@ public class SortOperator extends Operator{
      */
     private void getAllTuples(){
         Tuple tuple = operator.getNextTuple();
+        tableName = tuple.getTableName();
+        columns = tuple.getColumns();
+
+        int round = 0;
+        int fileNo = 1;
+        List<File> files = new ArrayList<>();
+
         while(tuple != null){
             tuples.add(tuple);
             tuple = operator.getNextTuple();
+            if(tuples.size() == DEFAULT_SIZE){
+                fileNo = saveTempFile(round, fileNo, files);
+            }
         }
 
-        tuples.sort(new MyComparator());
+        saveTempFile(round, fileNo, files);
+        externalMergeSort(files, round + 1);
+    }
+
+    private void externalMergeSort(List<File> files, int round) {
+        if(files.size() == 1){
+            try {
+                finalFile = new BufferedReader(new FileReader(files.get(0)));
+                files.get(0).deleteOnExit();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            return;
+        }
+        int fileNo = 1;
+        List<File> outputFiles = new ArrayList<>();
+        Comparator<Tuple> comparator = new MyComparator();
+
+        int i = 0;
+        for (i = 0; i < files.size(); i += 2) {
+            File inputFile1 = files.get(i);
+            File inputFile2 = files.get(i + 1);
+            try {
+                File tmp = File.createTempFile(tmpPrefix + "_" + round + "_" + fileNo, "tmp");
+                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tmp));
+
+                BufferedReader br1 = new BufferedReader(new FileReader(inputFile1));
+                BufferedReader br2 = new BufferedReader(new FileReader(inputFile2));
+
+                String s1 = br1.readLine();
+                String s2 = br2.readLine();
+
+                if(s1 == null){
+                    while(s2 != null){
+                        bufferedWriter.write(s2);
+                        s2 = br2.readLine();
+                    }
+                   continue;
+                }
+
+                if(s2 == null){
+                    while(s1 != null){
+                        bufferedWriter.write(s1);
+                        s1 = br1.readLine();
+                    }
+                    continue;
+                }
+
+                String[] split1 = s1.split(",");
+                String[] split2 = s2.split(",");
+
+                Tuple tmp1 = new Tuple();
+                Tuple tmp2 = new Tuple();
+
+                List<Integer> list1 = new ArrayList<>();
+                List<Integer> list2 = new ArrayList<>();
+
+                for (int i1 = 0; i1 < split1.length; i1++) {
+                    list1.add(Integer.valueOf(split1[i1]));
+                }
+
+                for (int i1 = 0; i1 < split2.length; i1++) {
+                    list2.add(Integer.valueOf(split2[i1]));
+                }
+
+                tmp1.setColumns(columns);
+                tmp1.setValues(list1);
+
+                tmp2.setColumns(columns);
+                tmp2.setValues(list2);
+
+                while(s1 != null || s2 != null){
+                    if(s1 == null){
+                        bufferedWriter.write(s2);
+                        s2 = br2.readLine();
+                        continue;
+                    }else if(s2 == null){
+                        bufferedWriter.write(s1);
+                        s1 = br1.readLine();
+                        continue;
+                    }
+                    int compare = comparator.compare(tmp1, tmp2);
+                    if(compare > 0){
+                        bufferedWriter.write(s1);
+                        s1 = br1.readLine();
+                        split1 = s1.split(",");
+                        tmp1 = new Tuple();
+                        list1 = new ArrayList<>();
+                        for (int i1 = 0; i1 < split1.length; i1++) {
+                            list1.add(Integer.valueOf(split1[i1]));
+                        }
+                    }else{
+                        bufferedWriter.write(s2);
+                        s2 = br2.readLine();
+                        split2 = s2.split(",");
+                        tmp2 = new Tuple();
+                        list2 = new ArrayList<>();
+                        for (int i1 = 0; i1 < split1.length; i1++) {
+                            list2.add(Integer.valueOf(split2[i1]));
+                        }
+                    }
+
+
+                }
+
+
+                outputFiles.add(tmp);
+
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            inputFile1.deleteOnExit();
+            inputFile2.deleteOnExit();
+            fileNo++;
+        }
+
+        if(i - 2 < files.size()){
+            File file = files.get(i + 1);
+            outputFiles.add(file);
+        }
+
+        externalMergeSort(outputFiles, round + 1);
+
+    }
+
+    private int saveTempFile(int round, int fileNo, List<File> files) {
+        try {
+            File tmp = File.createTempFile(tmpPrefix + "_" + round + "_" + fileNo, "tmp");
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tmp));
+            tuples.sort(new MyComparator());
+            for (int i = 0; i < tuples.size(); i++) {
+                Tuple tempTuple = tuples.get(i);
+                bufferedWriter.write(createCSVString(tempTuple));
+            }
+            files.add(tmp);
+            fileNo++;
+            tuples.clear();
+            bufferedWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return fileNo;
+    }
+
+    private String createCSVString(Tuple tempTuple) {
+        StringBuffer sb = new StringBuffer();
+        List<Integer> values = tempTuple.getValues();
+        int first = values.get(0);
+        sb.append(String.valueOf(first));
+        for (int i = 1; i < values.size(); i++) {
+            sb.append(",");
+            sb.append(String.valueOf(values.get(i)));
+        }
+        sb.append("\n");
+        return sb.toString();
     }
 
     /**
@@ -48,14 +222,37 @@ public class SortOperator extends Operator{
      */
     @Override
     public Tuple getNextTuple() {
-        if(index == tuples.size()){
-            return null;
+        try {
+            String value = finalFile.readLine();
+            if(value == null){
+                return null;
+            }
+
+            Tuple tuple = new Tuple();
+            String[] valueArr = value.split(",");
+            List<Integer> values = new ArrayList<>();
+
+            for (int i = 0; i < valueArr.length; i++) {
+                values.add(Integer.valueOf(valueArr[i]));
+            }
+
+            tuple.setColumns(columns);
+            tuple.setValues(values);
+            tuple.setTableName(tableName);
+
+            return tuple;
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+//        if(index == tuples.size()){
+//            return null;
+//        }
 
-        Tuple tuple = tuples.get(index);
-        index++;
-
-        return tuple;
+//        Tuple tuple = tuples.get(index);
+//        index++;
+//
+//        return tuple;
     }
 
     /**
@@ -63,8 +260,13 @@ public class SortOperator extends Operator{
      */
     @Override
     public void reset() {
-        operator.reset();
-        index = 0;
+//        operator.reset();
+//        index = 0;
+        try {
+            finalFile.reset();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

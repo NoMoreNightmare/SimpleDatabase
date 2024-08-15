@@ -374,5 +374,16 @@ public class LightDBTest {
 		CCJSqlParserUtil.parse("insert into tb_nnn values (v1,v2,v3)");
 	}
 
+	@Test
+	public void testSize() throws IOException {
+//		FileWriter fw = new FileWriter("test.csv");
+//		fw.write("1,2,3\n");
+//		fw.close();
+
+
+	}
+
+
+
 
 }
