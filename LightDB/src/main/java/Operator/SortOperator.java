@@ -63,124 +63,161 @@ public class SortOperator extends Operator{
     }
 
     private void externalMergeSort(List<File> files, int round) {
-        if(files.size() == 1){
-            try {
-                finalFile = new BufferedReader(new FileReader(files.get(0)));
-                files.get(0).deleteOnExit();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+
+        while(true){
+            if(files.size() == 1){
+                try {
+                    finalFile = new BufferedReader(new FileReader(files.get(0)));
+//                    files.get(0).deleteOnExit();
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                return;
             }
-            return;
-        }
-        int fileNo = 1;
-        List<File> outputFiles = new ArrayList<>();
-        Comparator<Tuple> comparator = new MyComparator();
+            int fileNo = 1;
+            List<File> outputFiles = new ArrayList<>();
+            Comparator<Tuple> comparator = new MyComparator();
 
-        int i = 0;
-        for (i = 0; i < files.size(); i += 2) {
-            File inputFile1 = files.get(i);
-            File inputFile2 = files.get(i + 1);
-            try {
-                File tmp = File.createTempFile(tmpPrefix + "_" + round + "_" + fileNo, "tmp");
-                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tmp));
+            int i = 0;
+            for (i = 0; i < files.size() - 1; i += 2) {
+                File inputFile1 = files.get(i);
+                File inputFile2 = files.get(i + 1);
+                try {
+                    File tmp = File.createTempFile(tmpPrefix + "_" + round + "_" + fileNo, "tmp");
 
-                BufferedReader br1 = new BufferedReader(new FileReader(inputFile1));
-                BufferedReader br2 = new BufferedReader(new FileReader(inputFile2));
+                    BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tmp));
 
-                String s1 = br1.readLine();
-                String s2 = br2.readLine();
+                    BufferedReader br1 = new BufferedReader(new FileReader(inputFile1));
+                    BufferedReader br2 = new BufferedReader(new FileReader(inputFile2));
 
-                if(s1 == null){
-                    while(s2 != null){
-                        bufferedWriter.write(s2);
-                        s2 = br2.readLine();
-                    }
-                   continue;
-                }
+                    String s1 = br1.readLine();
+                    String s2 = br2.readLine();
 
-                if(s2 == null){
-                    while(s1 != null){
-                        bufferedWriter.write(s1);
-                        s1 = br1.readLine();
-                    }
-                    continue;
-                }
 
-                String[] split1 = s1.split(",");
-                String[] split2 = s2.split(",");
-
-                Tuple tmp1 = new Tuple();
-                Tuple tmp2 = new Tuple();
-
-                List<Integer> list1 = new ArrayList<>();
-                List<Integer> list2 = new ArrayList<>();
-
-                for (int i1 = 0; i1 < split1.length; i1++) {
-                    list1.add(Integer.valueOf(split1[i1]));
-                }
-
-                for (int i1 = 0; i1 < split2.length; i1++) {
-                    list2.add(Integer.valueOf(split2[i1]));
-                }
-
-                tmp1.setColumns(columns);
-                tmp1.setValues(list1);
-
-                tmp2.setColumns(columns);
-                tmp2.setValues(list2);
-
-                while(s1 != null || s2 != null){
                     if(s1 == null){
-                        bufferedWriter.write(s2);
-                        s2 = br2.readLine();
-                        continue;
-                    }else if(s2 == null){
-                        bufferedWriter.write(s1);
-                        s1 = br1.readLine();
+                        while(s2 != null){
+                            bufferedWriter.write(s2);
+                            bufferedWriter.write("\n");
+                            bufferedWriter.flush();
+                            s2 = br2.readLine();
+                        }
                         continue;
                     }
-                    int compare = comparator.compare(tmp1, tmp2);
-                    if(compare > 0){
-                        bufferedWriter.write(s1);
-                        s1 = br1.readLine();
-                        split1 = s1.split(",");
-                        tmp1 = new Tuple();
-                        list1 = new ArrayList<>();
-                        for (int i1 = 0; i1 < split1.length; i1++) {
-                            list1.add(Integer.valueOf(split1[i1]));
+
+                    if(s2 == null){
+                        while(s1 != null){
+                            bufferedWriter.write(s1);
+                            bufferedWriter.write("\n");
+                            bufferedWriter.flush();
+                            s1 = br1.readLine();
                         }
-                    }else{
-                        bufferedWriter.write(s2);
-                        s2 = br2.readLine();
-                        split2 = s2.split(",");
-                        tmp2 = new Tuple();
-                        list2 = new ArrayList<>();
-                        for (int i1 = 0; i1 < split1.length; i1++) {
-                            list2.add(Integer.valueOf(split2[i1]));
+                        continue;
+                    }
+
+                    String[] split1 = s1.split(",");
+                    String[] split2 = s2.split(",");
+
+
+                    Tuple tmp1 = new Tuple();
+                    Tuple tmp2 = new Tuple();
+
+                    List<Integer> list1 = new ArrayList<>();
+                    List<Integer> list2 = new ArrayList<>();
+
+
+                    for (int i1 = 0; i1 < split1.length; i1++) {
+                        list1.add(Integer.valueOf(split1[i1]));
+                    }
+
+                    for (int i1 = 0; i1 < split2.length; i1++) {
+                        list2.add(Integer.valueOf(split2[i1]));
+                    }
+
+                    tmp1.setColumns(columns);
+                    tmp1.setValues(list1);
+                    tmp1.setTableName(tableName);
+
+                    tmp2.setColumns(columns);
+                    tmp2.setValues(list2);
+                    tmp2.setTableName(tableName);
+
+                    while(s1 != null || s2 != null){
+                        if(s1 == null){
+                            bufferedWriter.write(s2);
+                            bufferedWriter.write("\n");
+                            bufferedWriter.flush();
+                            s2 = br2.readLine();
+                            continue;
+                        }else if(s2 == null){
+                            bufferedWriter.write(s1);
+                            bufferedWriter.write("\n");
+                            bufferedWriter.flush();
+                            s1 = br1.readLine();
+                            continue;
                         }
+                        int compare = comparator.compare(tmp1, tmp2);
+                        if(compare <= 0){
+                            bufferedWriter.write(s1);
+                            bufferedWriter.write("\n");
+                            bufferedWriter.flush();
+                            s1 = br1.readLine();
+                            if(s1 == null){
+                                continue;
+                            }
+                            split1 = s1.split(",");
+                            tmp1 = new Tuple();
+                            tmp1.setTableName(tableName);
+                            tmp1.setColumns(columns);
+                            list1 = new ArrayList<>();
+                            for (int i1 = 0; i1 < split1.length; i1++) {
+                                list1.add(Integer.valueOf(split1[i1]));
+                            }
+                            tmp1.setValues(list1);
+                        }else{
+                            bufferedWriter.write(s2);
+                            bufferedWriter.write("\n");
+                            bufferedWriter.flush();
+                            s2 = br2.readLine();
+                            if(s2 == null){
+                                continue;
+                            }
+                            split2 = s2.split(",");
+                            tmp2 = new Tuple();
+                            list2 = new ArrayList<>();
+                            tmp2.setColumns(columns);
+                            tmp2.setTableName(tableName);
+                            for (int i1 = 0; i1 < split2.length; i1++) {
+                                list2.add(Integer.valueOf(split2[i1]));
+                            }
+                            tmp2.setValues(list2);
+                        }
+
+
                     }
 
 
+                    outputFiles.add(tmp);
+
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
-
-
-                outputFiles.add(tmp);
-
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                inputFile1.delete();
+                inputFile2.delete();
+                fileNo++;
             }
-            inputFile1.deleteOnExit();
-            inputFile2.deleteOnExit();
-            fileNo++;
-        }
 
-        if(i - 2 < files.size()){
-            File file = files.get(i + 1);
-            outputFiles.add(file);
-        }
 
-        externalMergeSort(outputFiles, round + 1);
+            if(i == files.size() - 1){
+                File file = files.get(i);
+                outputFiles.add(file);
+            }
+
+            files = outputFiles;
+            round += 1;
+//            externalMergeSort(outputFiles, round + 1);
+
+        }
 
     }
 
@@ -189,9 +226,11 @@ public class SortOperator extends Operator{
             File tmp = File.createTempFile(tmpPrefix + "_" + round + "_" + fileNo, "tmp");
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tmp));
             tuples.sort(new MyComparator());
+
             for (int i = 0; i < tuples.size(); i++) {
                 Tuple tempTuple = tuples.get(i);
                 bufferedWriter.write(createCSVString(tempTuple));
+                bufferedWriter.flush();
             }
             files.add(tmp);
             fileNo++;

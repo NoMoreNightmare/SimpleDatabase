@@ -375,11 +375,14 @@ public class LightDBTest {
 	}
 
 	@Test
-	public void testSize() throws IOException {
-//		FileWriter fw = new FileWriter("test.csv");
-//		fw.write("1,2,3\n");
-//		fw.close();
+	public void testExternalSort() throws IOException, JSQLParserException {
+		Statement statement = CCJSqlParserUtil.parse("select * from Test order by Test.X");
+		Catalog.getInstance().setDbPath("samples/db");
+		Catalog.getInstance().setDatabase("data");
+		Catalog.getInstance().setSchemaFile("schema.txt");
 
+		Operator operator = new QueryConstructor().constructor(statement);
+		operator.dump();
 
 	}
 
