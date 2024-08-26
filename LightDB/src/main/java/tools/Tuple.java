@@ -106,4 +106,18 @@ public class Tuple {
     public int hashCode() {
         return Objects.hash(values);
     }
+
+    @Override
+    public String toString(){
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < values.size(); i++) {
+            sb.append(String.valueOf(values.get(i)));
+            sb.append(",");
+        }
+
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("\n");
+
+        return sb.toString();
+    }
 }

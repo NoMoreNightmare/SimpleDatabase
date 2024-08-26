@@ -386,6 +386,21 @@ public class LightDBTest {
 
 	}
 
+	@Test
+	public void testEliminateDuplication() throws JSQLParserException, IOException {
+		Statement statement = CCJSqlParserUtil.parse("select distinct * from EliminateDuplication");
+		Catalog.getInstance().setDbPath("samples/db");
+		Catalog.getInstance().setDatabase("data");
+		Catalog.getInstance().setSchemaFile("schema.txt");
+
+		Operator operator = new QueryConstructor().constructor(statement);
+		operator.dump();
+
+
+	}
+
+
+
 
 
 
